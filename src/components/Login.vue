@@ -20,23 +20,25 @@
 </template>
 
 <script>
+import md5 from 'js-md5'
+
 export default {
   data() {
     var validateUsername = (rule, value, callback) => {
       if (value === '') {
-        callback(new Error('请输入用户名!'));
+        callback(new Error('请输入用户名!'))
       } else {
-        callback();
+        callback()
       }
-    };
+    }
 
     var validatePassword = (rule, value, callback) => {
       if (value === '') {
-        callback(new Error('请输入密码!'));
+        callback(new Error('请输入密码!'))
       } else {
-        callback();
+        callback()
       }
-    };
+    }
 
     return {
       loginForm: {
@@ -57,22 +59,34 @@ export default {
     login() {
       this.$refs.loginForm.validate((valid)=>{
         if (valid) {
-          this.$message({
-            message: '用户名：'+this.loginForm.username+'\n密码：'+this.loginForm.password,
-            type: 'success'
-          });
+          this.postData(this.loginForm)
+          // console.log(md5(this.loginForm.password))
         } else {
           this.$message({
             message: '没按要求输入',
             type: 'warning'
-          });
+          })
         }
-      });
+      })
+    },
+    postData(data) {
+      var _this = this
+      this.$http.post('/api/logi', {username:data.username, password:md5(data.password)}, {emulateJSON:true})
+      .then(res => {
+        console.log(res.body)
+        var sucData = res.body
+          _this.$message({
+            message: sucData.errMsg,
+            type: sucData.msgType
+          })
+      }, err => {
+        console.login(err.status)
+        _this.$message.error('请求错误：'+err.status)
+      })
     }
   }
 }
 </script>
-
 
 <style scoped>
   #loginVue {
