@@ -13,14 +13,13 @@
         </el-form-item>
       </el-form>
     </div>
-    <div id="loginFooter">
-      <p> &copy;2017 Notos - NotFamous</p>
-    </div>
+    <not-footer></not-footer>
   </div>
 </template>
 
 <script>
 import md5 from 'js-md5'
+import NotFooter from '@/components/public/NotFooter.vue'
 
 export default {
   data() {
@@ -79,11 +78,15 @@ export default {
             message: sucData.errMsg,
             type: sucData.msgType
           })
+          _this.$router.push({path:'/controller'})
       }, err => {
         console.log(err.status)
         _this.$message.error('请求错误：'+err.status)
       })
     }
+  },
+  components: {
+    NotFooter
   }
 }
 </script>
@@ -98,19 +101,11 @@ export default {
   #loginDiv {
     width: 370px;
     position: relative;
-    border: 0;
     padding: 5px 0;
     background: #fff;
-    margin: 175px auto 0 auto;
+    margin: 120px auto 0 auto;
+    border: 0;
     border-radius: 4px;
-  }
-
-  #loginFooter {
-    position: absolute;
-    color: #2c3e50;
-    text-align: center;
-    bottom: 0;
-    width: 100%
   }
 
   .el-form-item {
