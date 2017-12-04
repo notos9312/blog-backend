@@ -71,7 +71,7 @@ export default {
     },
     postData(data) {
       var _this = this
-      this.$http.post('/api/logi', {username:data.username, password:md5(data.password)}, {emulateJSON:true})
+      this.$http.post('/api/login', {username:data.username, password:md5(data.password)}, {emulateJSON:true})
       .then(res => {
         console.log(res.body)
         var sucData = res.body
@@ -80,7 +80,7 @@ export default {
             type: sucData.msgType
           })
       }, err => {
-        console.login(err.status)
+        console.log(err.status)
         _this.$message.error('请求错误：'+err.status)
       })
     }
@@ -90,9 +90,9 @@ export default {
 
 <style scoped>
   #loginVue {
-    margin: 0;
-    padding: 100px 300px 0 300px;
+    margin: 0 auto;
     text-align: center;
+    height: 100%;
   }
 
   #loginDiv {
@@ -101,15 +101,16 @@ export default {
     border: 0;
     padding: 5px 0;
     background: #fff;
-    margin: 0 auto;
+    margin: 175px auto 0 auto;
     border-radius: 4px;
   }
 
   #loginFooter {
-    position: relative;
-    padding-top: 280px;
+    position: absolute;
     color: #2c3e50;
     text-align: center;
+    bottom: 0;
+    width: 100%
   }
 
   .el-form-item {
