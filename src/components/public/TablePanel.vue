@@ -1,6 +1,6 @@
 <template>
   <div id="tablePanelVue">
-    <span>{{'panelType: '+panelType}}</span>
+    <p>{{'panelType: '+panelType}}</p>
   </div>
 </template>
 
@@ -14,4 +14,11 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+  #tablePanelVue {
+    height: auto;
+  }
+</style>
+
 
