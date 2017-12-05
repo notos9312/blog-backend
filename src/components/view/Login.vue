@@ -65,6 +65,7 @@ export default {
             message: '没按要求输入',
             type: 'warning'
           })
+          this.$router.push({path:'/test/123'})
         }
       })
     },
@@ -79,7 +80,7 @@ export default {
             type: sucData.msgType
           })
           if(sucData.errCode === 0){
-            _this.$router.push({path:'/controller'})
+            _this.$router.push({path:'/controller/all'})
           }
       }, err => {
         console.log(err.status)
