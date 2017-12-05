@@ -6,7 +6,7 @@
           <el-input placeholder="用户名" v-model="loginForm.username" clearable></el-input>
         </el-form-item>
         <el-form-item prop="password">
-          <el-input type="password" v-model="loginForm.password" placeholder="密码" clearable></el-input>
+          <el-input type="password" v-model="loginForm.password" placeholder="密码" @keyup.enter.native="login()" clearable></el-input>
         </el-form-item>
         <el-form-item>
           <el-button type="primary" @click="login()">登录</el-button>
@@ -78,7 +78,9 @@ export default {
             message: sucData.errMsg,
             type: sucData.msgType
           })
-          _this.$router.push({path:'/controller'})
+          if(sucData.errCode === 0){
+            _this.$router.push({path:'/controller'})
+          }
       }, err => {
         console.log(err.status)
         _this.$message.error('请求错误：'+err.status)
@@ -103,7 +105,8 @@ export default {
     position: relative;
     padding: 5px 0;
     background: #fff;
-    margin: 120px auto 0 auto;
+    margin: 0 auto;
+    top: 20%;
     border: 0;
     border-radius: 4px;
   }

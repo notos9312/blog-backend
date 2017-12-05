@@ -6,10 +6,10 @@
         <el-row>
           <el-col :span="7" style="box-sizing:border-box; padding-top:90px;">
             <div id="userMsg">
-              <div id="avatar"><img width="100%" height="100%" src="../../assets/images/avatar.png" alt="my avatar"></div>
+              <div id="avatar" @click="clickAvatar()"><img width="100%" height="100%" src="../../assets/images/avatar.png" alt="my avatar"></div>
             </div>
             <el-aside style="width:100%; height:100%;">
-              <el-menu :default-openeds="['1', '2']">
+              <el-menu :default-openeds="['1', '2']" defaultActive="1-2">
                 <el-submenu index="1">
                   <template slot="title">发布总览</template>
                   <el-menu-item index="1-1" style="padding-left:55px;">记事</el-menu-item>
@@ -54,11 +54,6 @@ export default {
   components: {
     NotFooter
   },
-  data() {
-    return {
-      hello: 'hello?'
-    }
-  },
   created: function() {
     var _this = this
     this.$http.get('/api/hello').then(res => {
@@ -66,6 +61,16 @@ export default {
     }, err => {
       _this.hello = err.status
     })
+  },
+  data() {
+    return {
+      hello: 'hello?'
+    }
+  },
+  methods: {
+    clickAvatar: function() {
+      this.$message("click avatar")
+    }
   }
 }
 </script>
