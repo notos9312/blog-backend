@@ -42,8 +42,9 @@
                 <!-- <el-button type="success" icon="el-icon-circle-plus" @click="clickCreate()">新增</el-button>
                 <el-button type="danger" icon="el-icon-delete">删除</el-button> -->
                 <ul>
-                  <li v-if="createSeen"><el-button type="success" icon="el-icon-circle-plus" @click="clickCreate()">新增</el-button></li>
+                  <li v-if="createSeen"><el-button type="success" icon="el-icon-circle-plus-outline" @click="clickCreate()">新增</el-button></li>
                   <li v-if="editSeen"><el-button type="success" icon="el-icon-edit-outline" @click="clickEdit()">编辑</el-button></li>
+                  <li v-if="cancelSeen"><el-button type="info" icon="el-icon-close" @click="clickCancel()">取消</el-button></li>
                   <li v-if="saveSeen"><el-button type="success" icon="el-icon-check" @click="clickSave()">保存</el-button></li>
                   <li v-if="deleteSeen"><el-button type="danger" icon="el-icon-delete" @click="clickDelete()">删除</el-button></li>
                 </ul>
@@ -72,15 +73,16 @@ export default {
     TablePanel
   },
   created: function() {
-    console.log(this.$route.path);
+    this.setBtnSeen(false, false, false, false, true)
   },
   data() {
     return {
       hello: 'hello?',
       createSeen: true,
-      deleteSeen: true,
       editSeen: false,
+      cancelSeen: false,
       saveSeen: false,
+      deleteSeen: true,
     }
   },
   methods: {
@@ -92,19 +94,34 @@ export default {
     },
     clickCreate: function() {
       this.$message("click create btn")
-      this.createSeen = false
-      this.deleteSeen = false
-      this.saveSeen = true
       this.$router.push('/controller/create'+this.firstToUpperCase(this.$route.params.panelType))
     },
     handleOpen: function(key, keyPath) {
       console.log(key)
       console.log(keyPath)
+    },
+    setBtnSeen: function(createSeen, editSeen, cancelSeen, saveSeen, deleteSeen){
+      this.createSeen = createSeen
+      this.editSeen = editSeen
+      this.cancelSeen = cancelSeen
+      this.saveSeen = saveSeen
+      this.deleteSeen = deleteSeen
     }
   },
   watch: {
     '$route': function(){
-      console.log('/api/get' + this.firstToUpperCase(this.$route.params.panelType))
+      // console.log('/api/get' + this.firstToUpperCase(this.$route.params.panelType))
+      switch (this.$route.params.panelType) {
+        case "all":
+          this.setBtnSeen(false, true, false, false)
+          break;
+        case "articles":
+        case "essays":
+        case "notes":
+          this.setBtnSeen(true, true, false, false)
+        default:
+          break;
+      }
     }
   }
 }

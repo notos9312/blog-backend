@@ -3,7 +3,7 @@
     <div id="loginDiv">
       <el-form :model="loginForm" :rules="loginRules" ref="loginForm">
         <el-form-item prop="username">
-          <el-input placeholder="用户名" v-model="loginForm.username" clearable></el-input>
+          <el-input :autofocus="true" placeholder="用户名" v-model="loginForm.username" clearable></el-input>
         </el-form-item>
         <el-form-item prop="password">
           <el-input type="password" v-model="loginForm.password" placeholder="密码" @keyup.enter.native="login()" clearable></el-input>
