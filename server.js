@@ -41,10 +41,12 @@ app.post('/api/login', urlencodedParser, function(req, res){
   mongoCilent.connect(BASE_DB_CONN_STR+'not-blog', function(err,db){
     console.log('login: connect db not-blog successfully!')
     selectData(db, 'users', {username: verify_username}, function(result){
-      if(result[0].password && result[0].password === verify_password){
-        res.send(JSON.stringify({errCode:0, errMsg:'操作成功', msgType:'success'}))
+      console.log('result.length: '+result.length)
+      if (result.length > 0 && result[0].password === verify_password){
+        console.log(result[0])
+        res.send(JSON.stringify({ errCode: 0, errMsg: '操作成功', msgType: 'success' }))
       } else {
-        res.send(JSON.stringify({errCode:1, errMsg:'用户名或密码错误', msgType:'error'}))
+        res.send(JSON.stringify({ errCode: 1, errMsg: '用户名或密码错误', msgType: 'error' }))
       }
       db.close()
     })

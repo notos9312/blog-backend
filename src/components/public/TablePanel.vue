@@ -7,11 +7,11 @@
 <script>
 export default {
   props:['panelType'],
-  watch: {
-    panelType: function(newVal, oldVal){
-      this.$message('old: '+oldVal+', new: '+newVal)
-    }
-  }
+  // watch: {
+  //   panelType: function(newVal, oldVal){
+  //     this.$message('old: '+oldVal+', new: '+newVal)
+  //   }
+  // }
 }
 </script>
 

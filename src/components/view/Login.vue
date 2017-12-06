@@ -75,6 +75,7 @@ export default {
       .then(res => {
         console.log(res.body)
         var sucData = res.body
+        if(sucData.errCode != 0)
           _this.$message({
             message: sucData.errMsg,
             type: sucData.msgType

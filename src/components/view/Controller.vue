@@ -10,6 +10,7 @@
             </div>
             <el-aside style="width:100%">
               <el-menu :default-openeds="['1', '2']"
+                @open="handleOpen"
                 :defaultActive="$route.path"
                 background-color="#EEF1F6"
                 :router="true">
@@ -26,23 +27,26 @@
                     style="padding-left:55px;">笔记</el-menu-item>
                 </el-submenu>
                 <el-submenu index="2">
-                  <template slot="title">实验场</template>
-                    <el-menu-item index="2-1" style="padding-left:55px;">敬请期待</el-menu-item>
-                </el-submenu>
-                <el-submenu index="3">
                   <template slot="title">个人资料</template>
-                    <el-menu-item index="3-1" style="padding-left:55px;">基本资料</el-menu-item>
+                    <el-menu-item index="profile" style="padding-left:55px;">基本资料</el-menu-item>
                 </el-submenu>
               </el-menu>
             </el-aside>
           </el-col>
           <el-col id="rightOpt" :span="17" style="box-sizing:border-box; padding-top:90px;">
             <div id="optNav" style="color:#fff;">
-              <div id="location" style="float:left; height:100%; margin:30px;">
-                <span style="vertical-align:middle;"><a href="" style="color:#fff;">总览</a> - <a href="" style="color:#fff;">记事</a></span>
-              </div>
-              <div id="optBtn" style="float:right; height:100%; margin:30px;">
-                <a href="" style="color:#fff;">新增</a> / <a href="" style="color:#fff;">删除</a>
+              <!-- <div id="location" style="float:left; height:100%; ">
+                <span style="vertical-align:middle;"> <router-link to="/controller/all">总览</router-link> - <a href="#/controller/essays">随笔</a></span>
+              </div> -->
+              <div id="optBtn">
+                <!-- <el-button type="success" icon="el-icon-circle-plus" @click="clickCreate()">新增</el-button>
+                <el-button type="danger" icon="el-icon-delete">删除</el-button> -->
+                <ul>
+                  <li v-if="createSeen"><el-button type="success" icon="el-icon-circle-plus" @click="clickCreate()">新增</el-button></li>
+                  <li v-if="editSeen"><el-button type="success" icon="el-icon-edit-outline" @click="clickEdit()">编辑</el-button></li>
+                  <li v-if="saveSeen"><el-button type="success" icon="el-icon-check" @click="clickSave()">保存</el-button></li>
+                  <li v-if="deleteSeen"><el-button type="danger" icon="el-icon-delete" @click="clickDelete()">删除</el-button></li>
+                </ul>
               </div>
             </div>
             <el-main id="optPanel">
@@ -68,21 +72,39 @@ export default {
     TablePanel
   },
   created: function() {
-    var _this = this
-    this.$http.get('/api/hello').then(res => {
-      _this.hello = res.body
-    }, err => {
-      _this.hello = err.status
-    })
+    console.log(this.$route.path);
   },
   data() {
     return {
       hello: 'hello?',
+      createSeen: true,
+      deleteSeen: true,
+      editSeen: false,
+      saveSeen: false,
     }
   },
   methods: {
     clickAvatar: function() {
       this.$message("click avatar")
+    },
+    firstToUpperCase: function(str) {
+      return str.substring(0,1).toUpperCase() + str.substring(1)
+    },
+    clickCreate: function() {
+      this.$message("click create btn")
+      this.createSeen = false
+      this.deleteSeen = false
+      this.saveSeen = true
+      this.$router.push('/controller/create'+this.firstToUpperCase(this.$route.params.panelType))
+    },
+    handleOpen: function(key, keyPath) {
+      console.log(key)
+      console.log(keyPath)
+    }
+  },
+  watch: {
+    '$route': function(){
+      console.log('/api/get' + this.firstToUpperCase(this.$route.params.panelType))
     }
   }
 }
@@ -138,7 +160,15 @@ export default {
     background-color: rgba(64,158,238,0.8);
     border: 0;
     border-radius: 0 4px 0 0;
-    /* padding-top: 30px; */
+  }
+  #optBtn {
+    float:right;
+    /* margin:30px 30px 0 0; */
+  }
+  #optBtn ul li {
+    list-style: none;
+    float: left;
+    margin: 12px 30px 0 0;
   }
   #optPanel {
     height: 100%;
@@ -155,15 +185,16 @@ export default {
   }
   .el-menu {
     width: 100%;
+    border-right: 0;
   }
   a{
     text-decoration: none;
-    color: #2d2f33;
+    color: #fff;
   }
   .router-link-active {
     text-decoration: none;
     color: #409EFF;
-}
+  }
 </style>
 
 <style>
