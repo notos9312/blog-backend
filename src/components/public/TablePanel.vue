@@ -1,6 +1,10 @@
 <template>
   <div id="tablePanelVue" v-if="tableSeen">
-    <p>{{'TablePanel - panelType: '+panelType}}</p>
+    <div v-if='true' id="noContentHint">
+      <p>当前还没有内容噢~快去添加新东西吧！</p>
+      <p>你应该先点击左边导航栏，“新增”按钮就出现了</p>
+    </div>
+    <div id="contentTable"></div>
   </div>
 </template>
 

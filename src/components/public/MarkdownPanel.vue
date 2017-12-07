@@ -4,27 +4,30 @@
       <!-- <el-tag>{{this.getTypeCN}}</el-tag> -->
       <el-input style="width:100%;" id="titleText" placeholder="请输入标题"></el-input>
     </div>
-    <mavon-editor v-model="getMdData" ref='md'></mavon-editor>
+    <mavon-editor
+      v-model="mdData"
+      ref='md'
+      subfield='false'
+      default_open='preview'
+      editable='false'
+      toolbarsFlag='false'> </mavon-editor>
   </div>
 </template>
 
 <script>
 export default {
-  props: ['panelType', 'markdownSeen', 'value'],
+  props: ['panelType', 'markdownSeen', 'value', 'isEdit'],
   data() {
     return {
-      mdData: 'test',
+      mdData: this.value,
+      toolBar: {
+
+      }
     }
   },
-  computed: {
-    'getMdData': {
-      set(value) {
-        console.log(value)
-        this.mdData = value
-      },
-      get() {
-        return this.mdData
-      }
+  watch: {
+    'value': function(){
+      this.mdData = this.value
     }
   }
 }

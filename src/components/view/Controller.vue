@@ -101,7 +101,7 @@ export default {
     },
     clickCreate: function() {
       this.$message("click create btn")
-      this.markdownData = ' '
+      this.markdownData = ''
       this.$router.push({path: '/controller/'+this.$route.params.panelType, query:{opt:'create'}})
     },
     clickCancel: function() {
