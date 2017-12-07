@@ -41,8 +41,12 @@ export default new Router({
       component: Test
     },
     {
-      path: '/*',
-      redirect: '/login'
-    }
+      path: '/controller',
+      redirect: '/controller/all'
+    },
+    // {
+    //   path: '/*',
+    //   redirect: '/login'
+    // }
   ]
 })

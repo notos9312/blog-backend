@@ -5,6 +5,9 @@
 ## Build Setup
 
 ``` bash
+# run server
+node server.js
+
 # install dependencies
 npm install
 

@@ -28,7 +28,9 @@
                 </el-submenu>
                 <el-submenu index="2">
                   <template slot="title">个人资料</template>
-                    <el-menu-item index="profile" style="padding-left:55px;">基本资料</el-menu-item>
+                    <el-menu-item
+                    index="/controller/profile"
+                    style="padding-left:55px;">基本资料</el-menu-item>
                 </el-submenu>
               </el-menu>
             </el-aside>
@@ -43,15 +45,16 @@
                 <el-button type="danger" icon="el-icon-delete">删除</el-button> -->
                 <ul>
                   <li v-if="createSeen"><el-button type="success" icon="el-icon-circle-plus-outline" @click="clickCreate()">新增</el-button></li>
-                  <li v-if="editSeen"><el-button type="success" icon="el-icon-edit-outline" @click="clickEdit()">编辑</el-button></li>
-                  <li v-if="cancelSeen"><el-button type="info" icon="el-icon-close" @click="clickCancel()">取消</el-button></li>
+                  <li v-if="true"><el-button type="success" icon="el-icon-edit-outline" @click="clickEdit()">编辑</el-button></li>
+                  <li v-if="cancelSeen"><el-button type="danger" icon="el-icon-close" @click="clickCancel()">取消</el-button></li>
                   <li v-if="saveSeen"><el-button type="success" icon="el-icon-check" @click="clickSave()">保存</el-button></li>
                   <li v-if="deleteSeen"><el-button type="danger" icon="el-icon-delete" @click="clickDelete()">删除</el-button></li>
                 </ul>
               </div>
             </div>
             <el-main id="optPanel">
-              <table-panel :panelType="panelType"></table-panel>
+              <table-panel :tableSeen="panelSeen.tableSeen" :panelType="panelType"></table-panel>
+              <markdown-panel ref="markdown" :value="markdownData" :markdownSeen="panelSeen.markdownSeen" :panelType="panelType"></markdown-panel>
             </el-main>
           </el-col>
         </el-row>
@@ -65,15 +68,17 @@
 <script>
 import NotFooter from '@/components/public/NotFooter'
 import TablePanel from '@/components/public/TablePanel'
+import MarkdownPanel from '@/components/public/MarkdownPanel'
 
 export default {
   props:['panelType'],
   components: {
     NotFooter,
-    TablePanel
+    TablePanel,
+    MarkdownPanel,
   },
   created: function() {
-    this.setBtnSeen(false, false, false, false, true)
+    this.initBtnSeen()
   },
   data() {
     return {
@@ -83,22 +88,79 @@ export default {
       cancelSeen: false,
       saveSeen: false,
       deleteSeen: true,
+      panelSeen: {
+        tableSeen: true,
+        markdownSeen: false
+      },
+      markdownData: '',
     }
   },
   methods: {
     clickAvatar: function() {
       this.$message("click avatar")
     },
+    clickCreate: function() {
+      this.$message("click create btn")
+      this.markdownData = ' '
+      this.$router.push({path: '/controller/'+this.$route.params.panelType, query:{opt:'create'}})
+    },
+    clickCancel: function() {
+      var _this = this
+      this.$confirm('将不做任何修改直接返回，是否继续？', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(()=>{
+        _this.$router.go(-1)
+      }).catch(()=>{})
+    },
+    clickEdit: function() {
+      var _this = this
+      this.$http.get('/api/getmd').then(res => {
+        _this.markdownData = res.body
+        _this.$router.push({path: '/controller/'+this.$route.params.panelType, query:{opt:'edit'}})
+        console.log('获取数据成功:')
+        console.log(res.body)
+      }, err => {
+        console.log("获取数据失败:"+err.status)
+      })
+    },
+    clickSave: function() {
+      console.log(this.$refs.markdown.mdData)
+    },
+    handleOpen: function(key, keyPath) {
+      if(key == 1) {
+        this.$router.push('/controller/all')
+      }
+    },
     firstToUpperCase: function(str) {
       return str.substring(0,1).toUpperCase() + str.substring(1)
     },
-    clickCreate: function() {
-      this.$message("click create btn")
-      this.$router.push('/controller/create'+this.firstToUpperCase(this.$route.params.panelType))
-    },
-    handleOpen: function(key, keyPath) {
-      console.log(key)
-      console.log(keyPath)
+    initBtnSeen: function(){
+      console.log(this.$route.query)
+      if(JSON.stringify(this.$route.query) != "{}"){
+        if (this.$route.query.opt == 'create' || this.$route.query.opt == 'edit'){
+          this.setBtnSeen(false, false, true, true, false)
+          this.panelSeen.tableSeen = false
+          this.panelSeen.markdownSeen = true
+        }
+      }else {
+        switch (this.$route.params.panelType) {
+          case "all":
+            this.setBtnSeen(false, false, false, false, true)
+            this.panelSeen.tableSeen = true
+            this.panelSeen.markdownSeen = false
+            break;
+          case "articles":
+          case "essays":
+          case "notes":
+          case "profile":
+            this.setBtnSeen(true, false, false, false, true)
+            this.panelSeen.tableSeen = true
+            this.panelSeen.markdownSeen = false
+            break;
+        }
+      }
     },
     setBtnSeen: function(createSeen, editSeen, cancelSeen, saveSeen, deleteSeen){
       this.createSeen = createSeen
@@ -109,20 +171,7 @@ export default {
     }
   },
   watch: {
-    '$route': function(){
-      // console.log('/api/get' + this.firstToUpperCase(this.$route.params.panelType))
-      switch (this.$route.params.panelType) {
-        case "all":
-          this.setBtnSeen(false, true, false, false)
-          break;
-        case "articles":
-        case "essays":
-        case "notes":
-          this.setBtnSeen(true, true, false, false)
-        default:
-          break;
-      }
-    }
+    '$route': 'initBtnSeen',
   }
 }
 </script>

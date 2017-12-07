@@ -1,12 +1,12 @@
 <template>
-  <div id="tablePanelVue">
-    <p>{{'panelType: '+panelType}}</p>
+  <div id="tablePanelVue" v-if="tableSeen">
+    <p>{{'TablePanel - panelType: '+panelType}}</p>
   </div>
 </template>
 
 <script>
 export default {
-  props:['panelType'],
+  props:['panelType', 'tableSeen'],
   // watch: {
   //   panelType: function(newVal, oldVal){
   //     this.$message('old: '+oldVal+', new: '+newVal)

@@ -1,6 +1,7 @@
 var express = require('express')
 var mongoCilent = require('mongodb').MongoClient
 var bodyParser = require('body-parser')
+var fs = require('fs')
 
 // 定义数据库的根路径
 var BASE_DB_CONN_STR = 'mongodb://59.110.136.203:27017/'
@@ -11,6 +12,17 @@ var urlencodedParser = bodyParser.urlencoded({ extended: false })
 
 app.get('/api/hello', function(req, res){
   res.send('Hello you~')
+})
+
+app.get('/api/getmd', function(req, res){
+  fs.readFile('README.md', function(err, data){
+    if (err) {
+      console.log(err)
+    } else {
+      console.log(data)
+      res.send(data)
+    }
+  })
 })
 
 app.post('/api/addUser', urlencodedParser, function(req, res){
