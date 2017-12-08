@@ -45,7 +45,7 @@
                 <el-button type="danger" icon="el-icon-delete">删除</el-button> -->
                 <ul>
                   <li v-if="createSeen"><el-button type="success" icon="el-icon-circle-plus-outline" @click="clickCreate()">新增</el-button></li>
-                  <li v-if="true"><el-button type="success" icon="el-icon-edit-outline" @click="clickEdit()">编辑</el-button></li>
+                  <li v-if="editSeen"><el-button type="success" icon="el-icon-edit-outline" @click="clickEdit()">编辑</el-button></li>
                   <li v-if="cancelSeen"><el-button type="danger" icon="el-icon-close" @click="clickCancel()">取消</el-button></li>
                   <li v-if="saveSeen"><el-button type="success" icon="el-icon-check" @click="clickSave()">保存</el-button></li>
                   <li v-if="deleteSeen"><el-button type="danger" icon="el-icon-delete" @click="clickDelete()">删除</el-button></li>
@@ -53,8 +53,16 @@
               </div>
             </div>
             <el-main id="optPanel">
-              <table-panel :tableSeen="panelSeen.tableSeen" :panelType="panelType"></table-panel>
-              <markdown-panel ref="markdown" :value="markdownData" :markdownSeen="panelSeen.markdownSeen" :panelType="panelType"></markdown-panel>
+              <table-panel :tableSeen="tableSeen" :panelType="panelType"></table-panel>
+              <!-- props: toolbarsFlag: false , subfield: false, default_open: "preview" -->
+              <markdown-panel
+                ref="markdown"
+                :value="markdownData"
+                :toolbarsFlag="mdToolbarsFlag"
+                :subfield="mdSubfield"
+                :default_open="mdDefault_open"
+                :markdownSeen="markdownSeen"
+                :panelType="panelType"></markdown-panel>
             </el-main>
           </el-col>
         </el-row>
@@ -82,17 +90,19 @@ export default {
   },
   data() {
     return {
+      // props: toolbarsFlag: false , subfield: false, default_open: "preview"
       hello: 'hello?',
       createSeen: true,
       editSeen: false,
       cancelSeen: false,
       saveSeen: false,
       deleteSeen: true,
-      panelSeen: {
-        tableSeen: true,
-        markdownSeen: false
-      },
+      tableSeen: true,
+      markdownSeen: false,
       markdownData: '',
+      mdToolbarsFlag: false,
+      mdSubfield: false,
+      mdDefault_open: "preview",  // edit or preview
     }
   },
   methods: {
@@ -118,6 +128,9 @@ export default {
       var _this = this
       this.$http.get('/api/getmd').then(res => {
         _this.markdownData = res.body
+        _this.mdToolbarsFlag = false,
+        _this.mdSubfield = false,
+        _this.mdDefault_open = "preview",
         _this.$router.push({path: '/controller/'+this.$route.params.panelType, query:{opt:'edit'}})
         console.log('获取数据成功:')
         console.log(res.body)
@@ -141,23 +154,20 @@ export default {
       if(JSON.stringify(this.$route.query) != "{}"){
         if (this.$route.query.opt == 'create' || this.$route.query.opt == 'edit'){
           this.setBtnSeen(false, false, true, true, false)
-          this.panelSeen.tableSeen = false
-          this.panelSeen.markdownSeen = true
+          this.tableSeen = false
         }
       }else {
         switch (this.$route.params.panelType) {
           case "all":
             this.setBtnSeen(false, false, false, false, true)
-            this.panelSeen.tableSeen = true
-            this.panelSeen.markdownSeen = false
+            this.tableSeen = true
             break;
           case "articles":
           case "essays":
           case "notes":
           case "profile":
             this.setBtnSeen(true, false, false, false, true)
-            this.panelSeen.tableSeen = true
-            this.panelSeen.markdownSeen = false
+            this.tableSeen = true
             break;
         }
       }
@@ -172,6 +182,9 @@ export default {
   },
   watch: {
     '$route': 'initBtnSeen',
+    'tableSeen': function() {
+      this.markdownSeen = !this.tableSeen
+    }
   }
 }
 </script>
