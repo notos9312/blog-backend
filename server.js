@@ -71,6 +71,28 @@ app.post('/api/createContent', urlencodedParser, function(req, res){
   })
 })
 
+app.post('/api/getContents', urlencodedParser, function(req, res){
+  var whereStr = {}
+  var opt = {
+    __v:0,
+    _id:0,
+    createTime:1,
+    contentType:1,
+    title:1
+  }
+  if(req.body.contentType != "all")  {
+    whereStr.contentType = req.body.contentType
+  }
+  ContentTitle.find(whereStr, function(error, result){
+    if (error) {
+      console.log(error)
+      res.send(JSON.stringify({ errCode: 999, errMsg: '数据库查询出错', msgType: 'error' }))
+    } else {
+      res.send(result)
+    }
+  })
+})
+
 // 定义插入内容函数
 function insertContent(contentData, callback) {
   var data = new Content(contentData)

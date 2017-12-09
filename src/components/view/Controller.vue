@@ -53,16 +53,17 @@
               </div>
             </div>
             <el-main id="optPanel">
-              <table-panel :tableSeen="tableSeen" :panelType="panelType"></table-panel>
-              <!-- props: toolbarsFlag: false , subfield: false, default_open: "preview" -->
+              <table-panel
+                :tableSeen="tableSeen"
+                :panelType="panelType"
+                :contentTitles="titleData" ></table-panel>
+
               <markdown-panel
                 ref="markdown"
                 :value="markdownData"
-                :toolbarsFlag="mdToolbarsFlag"
-                :subfield="mdSubfield"
-                :default_open="mdDefault_open"
+                :editabel="mdEditable"
                 :markdownSeen="markdownSeen"
-                :panelType="panelType"></markdown-panel>
+                :panelType="panelType" ></markdown-panel>
             </el-main>
           </el-col>
         </el-row>
@@ -87,10 +88,16 @@ export default {
   },
   created: function() {
     this.initBtnSeen()
+    this.initMarkdownPanel()
+    if(this.$route.params.panelType != "profile"){
+      this.getContents(this.$route.params.panelType)
+    } else {
+      // 请求profile的内容
+    }
+    console.log('created')
   },
   data() {
     return {
-      // props: toolbarsFlag: false , subfield: false, default_open: "preview"
       hello: 'hello?',
       createSeen: true,
       editSeen: false,
@@ -100,9 +107,8 @@ export default {
       tableSeen: true,
       markdownSeen: false,
       markdownData: '',
-      mdToolbarsFlag: false,
-      mdSubfield: false,
-      mdDefault_open: "preview",  // edit or preview
+      mdEditable: false,
+      titleData: [],
     }
   },
   methods: {
@@ -110,8 +116,8 @@ export default {
       this.$message("click avatar")
     },
     clickCreate: function() {
-      this.$message("click create btn")
       this.markdownData = ''
+      this.mdEditable = true
       this.$router.push({path: '/controller/'+this.$route.params.panelType, query:{opt:'create'}})
     },
     clickCancel: function() {
@@ -126,6 +132,7 @@ export default {
     },
     clickEdit: function() {
       var _this = this
+      this.mdEditable = true
       this.$http.get('/api/getmd').then(res => {
         _this.markdownData = res.body
         _this.mdToolbarsFlag = false,
@@ -139,7 +146,35 @@ export default {
       })
     },
     clickSave: function() {
-      console.log(this.$refs.markdown.mdData)
+      var _this = this
+      var mdTitle = this.$refs.markdown.titleData
+      var mdContent = this.$refs.markdown.mdData
+      console.log(mdTitle)
+      console.log(mdContent)
+      if (this.$route.query.opt == 'create'){  // 新增内容
+        if (this.$route.params.panelType != 'all' || this.$route.params.panelType != 'profile') {
+          var mdCreateTime = new Date().getTime()
+          var mdContentType = this.$route.params.panelType
+          var postObj = {
+            title: mdTitle,
+            content: mdContent,
+            createTime: mdCreateTime,
+            contentType: mdContentType
+          }
+          this.$http.post('/api/createContent', postObj, {emulateJSON:true})
+          .then(res => {
+            console.log(res.body)
+            var sucData = res.body
+            _this.$message({
+              message: sucData.errMsg,
+              type: sucData.msgType
+            })
+          }, err => {
+            console.log(err.status)
+            _this.$message.error('请求错误：'+err.status)
+          })
+          }
+        }
     },
     handleOpen: function(key, keyPath) {
       if(key == 1) {
@@ -149,8 +184,14 @@ export default {
     firstToUpperCase: function(str) {
       return str.substring(0,1).toUpperCase() + str.substring(1)
     },
+    setBtnSeen: function(createSeen, editSeen, cancelSeen, saveSeen, deleteSeen){
+      this.createSeen = createSeen
+      this.editSeen = editSeen
+      this.cancelSeen = cancelSeen
+      this.saveSeen = saveSeen
+      this.deleteSeen = deleteSeen
+    },
     initBtnSeen: function(){
-      console.log(this.$route.query)
       if(JSON.stringify(this.$route.query) != "{}"){
         if (this.$route.query.opt == 'create' || this.$route.query.opt == 'edit'){
           this.setBtnSeen(false, false, true, true, false)
@@ -172,16 +213,42 @@ export default {
         }
       }
     },
-    setBtnSeen: function(createSeen, editSeen, cancelSeen, saveSeen, deleteSeen){
-      this.createSeen = createSeen
-      this.editSeen = editSeen
-      this.cancelSeen = cancelSeen
-      this.saveSeen = saveSeen
-      this.deleteSeen = deleteSeen
+    initMarkdownPanel: function() {
+      console.log(this.$route.query)
+      if(JSON.stringify(this.$route.query) != "{}") {
+        if (this.$route.query.opt == 'create'){
+          this.mdEditable = true
+        } else if(this.$route.query.opt == 'edit') {
+          this.mdEditable = true
+        }
+      } else {
+        this.mdEditable = false
+      }
+    },
+    getContents: function(type) {
+      var _this = this
+      this.$http.post('/api/getContents', {contentType: type}, {emulateJSON:true})
+      .then(res => {
+        //res
+        if(res.body.hasOwnProperty("errCode")){
+          _this.$message({
+            message: res.body.errMsg,
+            type: res.body.msgType
+          })
+        } else {
+          this.titleData = res.body
+        }
+      }, err => {
+        console.log(err.status)
+        _this.$message.error('请求错误：'+err.status)
+      })
     }
   },
   watch: {
-    '$route': 'initBtnSeen',
+    '$route': function(){
+      this.initBtnSeen()
+      this.initMarkdownPanel()
+    },
     'tableSeen': function() {
       this.markdownSeen = !this.tableSeen
     }

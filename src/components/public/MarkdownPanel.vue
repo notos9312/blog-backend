@@ -1,32 +1,81 @@
 <template>
   <div id="markdownPanelVue" v-if="markdownSeen">
     <div id="title" style="text-align:left; padding-bottom: 10px;">
-      <el-input style="width:100%;" id="titleText" placeholder="请输入标题"></el-input>
+      <el-input v-model="titleData" :disabled="false" style="width:100%;" id="titleText" placeholder="请输入标题"></el-input>
     </div>
     <mavon-editor
       v-model="mdData"
       :toolbarsFlag="toolbarsFlag"
       :subfield="subfield"
       :default_open="default_open"
+      :toolbars="toolbarsObj"
       ref="md"> </mavon-editor>
   </div>
 </template>
 
 <script>
 export default {
-  props: ['panelType', 'markdownSeen', 'value', 'toolbarsFlag', 'subfield', 'default_open'],
+  props: ['panelType', 'markdownSeen', 'value', 'editabel'],
   data() {
     return {
+      titleData: '',
       mdData: this.value,
-      toolBarsSeen: fasle,
+      isEdit: this.editabel,
+      toolbarsFlag: false,
+      subfield: false,
+      default_open: 'preview',
+      toolbarsObj: {
+        bold: false, // 粗体
+        italic: false, // 斜体
+        header: false, // 标题
+        underline: false, // 下划线
+        strikethrough: false, // 中划线
+        mark: false, // 标记
+        superscript: false, // 上角标
+        subscript: false, // 下角标
+        quote: false, // 引用
+        ol: false, // 有序列表
+        ul: false, // 无序列表
+        link: true, // 链接
+        imagelink: true, // 图片链接
+        code: false, // code
+        table: true, // 表格
+        fullscreen: true, // 全屏编辑
+        readmodel: false, // 沉浸式阅读
+        htmlcode: false, // 展示html源码
+        help: true, // 帮助
+        undo: false, // 上一步
+        redo: false, // 下一步
+        trash: true, // 清空
+        save: false, // 保存（触发events中的save事件）
+        navigation: true, // 导航目录
+        alignleft: false, // 左对齐
+        aligncenter: false, // 居中
+        alignright: false, // 右对齐
+        subfield: true, // 单双栏模式
+        preview: true, // 预览
+      },
     }
   },
   watch: {
     'value': function(){
       this.mdData = this.value
     },
-    'toolbarsFlag': function(){
-      this.toolBarsSeen = this.toolbarsFlag
+    'editabel': function() {
+      this.isEdit = this.editabel
+      console.log('watch editable: '+this.editabel)
+    },
+    'isEdit': function() {
+      console.log('watch isEdit: '+this.isEdit)
+      if(this.isEdit) {
+        this.toolbarsFlag = true
+        this.subfield = true
+        this.default_open = 'edit'
+      } else {
+        this.toolbarsFlag = false
+        this.subfield = false
+        this.default_open = 'preview'
+      }
     }
   }
 }
