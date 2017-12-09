@@ -1,10 +1,11 @@
 var express = require('express')
-var mongoCilent = require('mongodb').MongoClient
 var bodyParser = require('body-parser')
 var fs = require('fs')
 
-// 定义数据库的根路径
-var BASE_DB_CONN_STR = 'mongodb://59.110.136.203:27017/'
+// 引入mongoose的Model
+var Content = require('./db/content.js')
+var ContentTitle = require('./db/contentTitle.js')
+var User = require('./db/user.js')
 
 var app = express()
 app.use(express.static(__dirname + '/src'))
@@ -12,83 +13,77 @@ var urlencodedParser = bodyParser.urlencoded({ extended: false })
 
 app.get('/api/hello', function(req, res){
   res.send('Hello you~')
-})
-
-app.get('/api/getmd', function(req, res){
-  fs.readFile('README.md', function(err, data){
-    if (err) {
-      console.log(err)
-    } else {
-      // console.log(data)
-      res.send(data)
-    }
-  })
-})
-
-app.post('/api/addUser', urlencodedParser, function(req, res){
-  var data = {
-    username: req.body.username,
-    password: req.body.password
-  }
-  // 数据库操作
-  mongoCilent.connect(BASE_DB_CONN_STR+'not-blog', function(err,db){
-    console.log('addUser: connect db not-blog successfully!')
-    insertData(db, 'users', data, function(result){
-      // 显示结果
-      console.log(result)
-      if(result.hasOwnProperty('result') && result.result.ok){
-        res.send('数据插入成功')
-      } else {
-        console.log('数据插入失败')
-        res.send('数据插入失败')
-      }
-      db.close()
-    })
-  })
+  // var tmp = {
+  //   createTime: new Date().getTime(),
+  //   contentType: 'articles',
+  //   title: 'my title',
+  //   content: 'my content'
+  // }
+  // insertContent(tmp, function(error, result){
+  //   if (error) {
+  //     res.send(error)
+  //   } else {
+  //     res.send(result)
+  //   }
+  // })
 })
 
 app.post('/api/login', urlencodedParser, function(req, res){
   var verify_username = req.body.username
   var verify_password = req.body.password
-  mongoCilent.connect(BASE_DB_CONN_STR+'not-blog', function(err,db){
-    console.log('login: connect db not-blog successfully!')
-    selectData(db, 'users', {username: verify_username}, function(result){
-      console.log('result.length: '+result.length)
-      if (result.length > 0 && result[0].password === verify_password){
-        console.log(result[0])
-        res.send(JSON.stringify({ errCode: 0, errMsg: '操作成功', msgType: 'success' }))
+  // 查询语句
+  var whereStr = {username: verify_username}
+  // 用User Model来查询users集合
+  User.find(whereStr, function(error, result){
+    if (error) {
+      res.send(JSON.stringify({ errCode: 999, errMsg: '数据库查询出错', msgType: 'error' }))
+    } else {
+      if (result[0].password === verify_password) {
+        res.send(JSON.stringify({ errCode: 0, errMsg: '操作成功', msgType: 'success'}))
       } else {
-        res.send(JSON.stringify({ errCode: 1, errMsg: '用户名或密码错误', msgType: 'error' }))
+        res.send(JSON.stringify({ errCode: 1, errMsg: '用户名或密码错误', msgType: 'error'}))
       }
-      db.close()
-    })
+    }
   })
 })
+
+app.post('/api/createContent', urlencodedParser, function(req, res){
+  // 先插入contents集合，再把标题插入到contentTitles集合
+  var contentData = req.body
+  insertContent(contentData, function(contentError, contentResult){
+    if (contentError) {
+      res.send(JSON.stringify({ errCode: 998, errMsg: '数据库插入内容出错', msgType: 'error' }))
+    } else {
+      var titleData = {
+        createTime: contentResult.createTime,
+        contentType: contentResult.contentType,
+        title: contentResult.title,
+        objectId: contentResult._id
+      }
+      insertContentTitle(titleData, function(titleError, titleResult){
+        if (titleError) {
+          res.send(JSON.stringify({ errCode: 997, errMsg: '数据库插入标题出错', msgType: 'error' }))
+        } else {
+          res.send(JSON.stringify({ errCode: 0, errMsg: '操作成功', msgType: 'success'}))
+        }
+      })
+    }
+  })
+})
+
+// 定义插入内容函数
+function insertContent(contentData, callback) {
+  var data = new Content(contentData)
+  data.save(callback)
+}
+
+// 定义插入内容标题函数
+function insertContentTitle(titleData, callback) {
+  var data = new ContentTitle(titleData)
+  data.save(callback)
+}
 
 // 监听端口
 app.listen(2333, function(){
   console.log('访问的地址为：http://localhost:2333')
 })
-
-// 定义插入数据函数
-var insertData = function(db, coll, data, callback){ //coll: 指定的集合  data: 插入的数据
-  db.collection(coll).insert(data, function(err, result){
-    if(err){
-      callback(err)
-      return
-    }
-    // 调用传入的回调函数，将操作结果返回
-    callback(result)
-  })
-}
-
-// 定义查询数据函数
-var selectData = function(db, coll, data, callback){
-  db.collection(coll).find(data).toArray(function(err,result){
-    if(err){
-      callback(err)
-      return
-    }
-    callback(result)
-  })
-}
