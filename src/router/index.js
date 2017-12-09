@@ -44,9 +44,9 @@ export default new Router({
       path: '/controller',
       redirect: '/controller/all'
     },
-    // {
-    //   path: '/*',
-    //   redirect: '/login'
-    // }
+    {
+      path: '/*',
+      redirect: '/login'
+    }
   ]
 })
