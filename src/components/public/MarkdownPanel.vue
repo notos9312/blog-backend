@@ -1,7 +1,7 @@
 <template>
   <div id="markdownPanelVue" v-if="markdownSeen">
     <div id="title" style="text-align:left; padding-bottom: 10px;">
-      <el-input v-model="titleData" :disabled="false" style="width:100%;" id="titleText" placeholder="请输入标题"></el-input>
+      <el-input v-model="titleData" :disabled="!editabel" style="width:100%;" id="titleText" placeholder="请输入标题"></el-input>
     </div>
     <mavon-editor
       v-model="mdData"
@@ -15,7 +15,7 @@
 
 <script>
 export default {
-  props: ['panelType', 'markdownSeen', 'value', 'editabel'],
+  props: ['panelType', 'markdownSeen', 'mTitle', 'value', 'editabel'],
   data() {
     return {
       titleData: '',
@@ -58,6 +58,9 @@ export default {
     }
   },
   watch: {
+    'mTitle': function(){
+      this.titleData = this.mTitle
+    },
     'value': function(){
       this.mdData = this.value
     },

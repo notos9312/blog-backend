@@ -52,6 +52,7 @@ app.post('/api/createContent', urlencodedParser, function(req, res){
   var contentData = req.body
   insertContent(contentData, function(contentError, contentResult){
     if (contentError) {
+      console.log(contentError)
       res.send(JSON.stringify({ errCode: 998, errMsg: '数据库插入内容出错', msgType: 'error' }))
     } else {
       var titleData = {
@@ -62,6 +63,7 @@ app.post('/api/createContent', urlencodedParser, function(req, res){
       }
       insertContentTitle(titleData, function(titleError, titleResult){
         if (titleError) {
+          console.log(titleError)
           res.send(JSON.stringify({ errCode: 997, errMsg: '数据库插入标题出错', msgType: 'error' }))
         } else {
           res.send(JSON.stringify({ errCode: 0, errMsg: '操作成功', msgType: 'success'}))
@@ -88,7 +90,60 @@ app.post('/api/getContents', urlencodedParser, function(req, res){
       console.log(error)
       res.send(JSON.stringify({ errCode: 999, errMsg: '数据库查询出错', msgType: 'error' }))
     } else {
-      res.send(result)
+      // var sendData = {
+      //   contentType: result.contentType,
+      //   createTime: result.createTime,
+      //   objectId: result.objectId,
+      //   title: result.title
+      // }
+      var sendData = result
+      for(var s in sendData){
+        delete sendData[s]._id
+        delete sendData[s].__v
+      }
+      res.send(sendData)
+    }
+  })
+})
+
+app.post('/api/getTheContent', urlencodedParser, function(req, res){
+  var id = req.body.objectId
+  Content.findById(id, function(error, result){
+    if(error){
+      console.log(error)
+      res.send(JSON.stringify({ errCode: 999, errMsg: '数据库查询出错', msgType: 'error' }))
+    } else {
+      var sendData = {
+        content: result.content,
+        title: result.title
+      }
+      res.send(sendData)
+    }
+  })
+})
+
+app.post('/api/updateContent', urlencodedParser, function(req, res){
+  var updateObjId = req.body.objectId
+  var updateContent = req.body.content
+  var updateTitle = req.body.title
+  var whereTitleStr = {objectId: updateObjId}
+  var updateContentStr = {content: updateContent, title: updateTitle}
+  var updateTitleStr = {title: updateTitle}
+  // 先修改content，再修改contentTitle
+  Content.findByIdAndUpdate(updateObjId, updateContentStr, function(contentError, contentResult){
+    if(contentError) {
+      console.log(contentError)
+      res.send(JSON.stringify({ errCode: 999, errMsg: '数据库查询出错', msgType: 'error' }))
+    } else {
+      // 修改content
+      ContentTitle.update(whereTitleStr, updateTitleStr, function(titleError, titleResult){
+        if(titleError) {
+          console.log(titleError)
+          res.send(JSON.stringify({ errCode: 999, errMsg: '数据库查询出错', msgType: 'error' }))
+        } else {
+          res.send(JSON.stringify({ errCode: 0, errMsg: '操作成功', msgType: 'success'}))
+        }
+      })
     }
   })
 })

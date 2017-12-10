@@ -10,12 +10,14 @@
             </div>
             <el-aside style="width:100%">
               <el-menu :default-openeds="['1', '2']"
-                @open="handleOpen"
                 :defaultActive="$route.path"
                 background-color="#EEF1F6"
                 :router="true">
                 <el-submenu index="1">
                   <template slot="title">发布总览</template>
+                  <el-menu-item
+                    index="/controller/all"
+                    style="padding-left:55px;">全部</el-menu-item>
                   <el-menu-item
                     index="/controller/articles"
                     style="padding-left:55px;">文章</el-menu-item>
@@ -37,12 +39,7 @@
           </el-col>
           <el-col id="rightOpt" :span="17" style="box-sizing:border-box; padding-top:90px;">
             <div id="optNav" style="color:#fff;">
-              <!-- <div id="location" style="float:left; height:100%; ">
-                <span style="vertical-align:middle;"> <router-link to="/controller/all">总览</router-link> - <a href="#/controller/essays">随笔</a></span>
-              </div> -->
               <div id="optBtn">
-                <!-- <el-button type="success" icon="el-icon-circle-plus" @click="clickCreate()">新增</el-button>
-                <el-button type="danger" icon="el-icon-delete">删除</el-button> -->
                 <ul>
                   <li v-if="createSeen"><el-button type="success" icon="el-icon-circle-plus-outline" @click="clickCreate()">新增</el-button></li>
                   <li v-if="editSeen"><el-button type="success" icon="el-icon-edit-outline" @click="clickEdit()">编辑</el-button></li>
@@ -54,12 +51,14 @@
             </div>
             <el-main id="optPanel">
               <table-panel
+                ref="titleTable"
                 :tableSeen="tableSeen"
                 :panelType="panelType"
                 :contentTitles="titleData" ></table-panel>
 
               <markdown-panel
                 ref="markdown"
+                :mTitle="markdownTitle"
                 :value="markdownData"
                 :editabel="mdEditable"
                 :markdownSeen="markdownSeen"
@@ -87,14 +86,23 @@ export default {
     MarkdownPanel,
   },
   created: function() {
+    // this.$router.push('/controller/'+this.$route.params.panelType)
     this.initBtnSeen()
     this.initMarkdownPanel()
+
+    console.log('created')
+  },
+  mounted: function(){
+    if(this.$route.query.opt == 'edit') {
+      this.$router.push({
+        path: '/controller/'+this.$route.params.panelType,
+        query:{opt:'browse', objid:this.$route.query.objid}})
+    }
     if(this.$route.params.panelType != "profile"){
       this.getContents(this.$route.params.panelType)
     } else {
       // 请求profile的内容
     }
-    console.log('created')
   },
   data() {
     return {
@@ -106,6 +114,7 @@ export default {
       deleteSeen: true,
       tableSeen: true,
       markdownSeen: false,
+      markdownTitle: '',
       markdownData: '',
       mdEditable: false,
       titleData: [],
@@ -116,52 +125,43 @@ export default {
       this.$message("click avatar")
     },
     clickCreate: function() {
+      this.titleData = ''
       this.markdownData = ''
       this.mdEditable = true
       this.$router.push({path: '/controller/'+this.$route.params.panelType, query:{opt:'create'}})
     },
     clickCancel: function() {
       var _this = this
-      this.$confirm('将不做任何修改直接返回，是否继续？', '提示', {
+      this.$confirm('将不做任何修改直接返回内容列表，是否继续？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(()=>{
-        _this.$router.go(-1)
+        _this.$router.push('/controller/'+this.$route.params.panelType)
       }).catch(()=>{})
     },
     clickEdit: function() {
       var _this = this
-      this.mdEditable = true
-      this.$http.get('/api/getmd').then(res => {
-        _this.markdownData = res.body
-        _this.mdToolbarsFlag = false,
-        _this.mdSubfield = false,
-        _this.mdDefault_open = "preview",
-        _this.$router.push({path: '/controller/'+this.$route.params.panelType, query:{opt:'edit'}})
-        console.log('获取数据成功:')
-        console.log(res.body)
-      }, err => {
-        console.log("获取数据失败:"+err.status)
-      })
+      this.$router.push({path: '/controller/'+this.$route.params.panelType, query:{opt:'edit', objid:this.$route.query.objid}})
     },
     clickSave: function() {
       var _this = this
       var mdTitle = this.$refs.markdown.titleData
       var mdContent = this.$refs.markdown.mdData
+      var mdObjId = this.$route.query.objid
       console.log(mdTitle)
       console.log(mdContent)
       if (this.$route.query.opt == 'create'){  // 新增内容
         if (this.$route.params.panelType != 'all' || this.$route.params.panelType != 'profile') {
           var mdCreateTime = new Date().getTime()
           var mdContentType = this.$route.params.panelType
-          var postObj = {
+          var postData = {
             title: mdTitle,
             content: mdContent,
             createTime: mdCreateTime,
             contentType: mdContentType
           }
-          this.$http.post('/api/createContent', postObj, {emulateJSON:true})
+          this.$http.post('/api/createContent', postData, {emulateJSON:true})
           .then(res => {
             console.log(res.body)
             var sucData = res.body
@@ -169,16 +169,34 @@ export default {
               message: sucData.errMsg,
               type: sucData.msgType
             })
+            _this.$router.push('/controller/'+_this.$route.params.panelType)
           }, err => {
             console.log(err.status)
             _this.$message.error('请求错误：'+err.status)
           })
-          }
+        } else if(this.$route.params.panelType == 'profile') {  // 保存个人资料
+
         }
-    },
-    handleOpen: function(key, keyPath) {
-      if(key == 1) {
-        this.$router.push('/controller/all')
+      } else if(this.$route.query.opt == 'edit') {  // 保存内容
+        //
+        var postData = {
+          title: mdTitle,
+          content: mdContent,
+          objectId: mdObjId
+        }
+        this.$http.post('/api/updateContent', postData, {emulateJSON:true})
+        .then(res => {
+          console.log(res.body)
+          var sucData = res.body
+          _this.$message({
+            message: sucData.errMsg,
+            type: sucData.msgType
+          })
+          _this.$router.push('/controller/'+_this.$route.params.panelType)
+        }, err => {
+          console.log(err.status)
+            _this.$message.error('请求错误：'+err.status)
+        })
       }
     },
     firstToUpperCase: function(str) {
@@ -200,26 +218,43 @@ export default {
       }else {
         switch (this.$route.params.panelType) {
           case "all":
-            this.setBtnSeen(false, false, false, false, true)
+            this.setBtnSeen(false, false, false, false, false)
             this.tableSeen = true
             break;
           case "articles":
           case "essays":
           case "notes":
           case "profile":
-            this.setBtnSeen(true, false, false, false, true)
+            this.setBtnSeen(true, false, false, false, false)
             this.tableSeen = true
             break;
         }
       }
     },
     initMarkdownPanel: function() {
-      console.log(this.$route.query)
-      if(JSON.stringify(this.$route.query) != "{}") {
+      var _this = this
+      if(JSON.stringify(this.$route.query) != "{}") {  // 新增或者编辑的情况
         if (this.$route.query.opt == 'create'){
           this.mdEditable = true
         } else if(this.$route.query.opt == 'edit') {
           this.mdEditable = true
+        } else if(this.$route.query.opt == 'browse') {
+          this.setBtnSeen(false, true, false, false, false)
+          this.tableSeen = false
+          this.mdEditable = false
+          // console.log(this.$refs.titleTable.titleObj) //this.$route.query.objid this.$refs.titleTable.titleObj.objectId
+          this.$http.post('/api/getTheContent', {objectId: this.$route.query.objid}, {emulateJSON:true})
+          .then(res => {
+            if(res.body.hasOwnProperty("errCode") && res.body.errCode == 0){
+              _this.$message({
+                message: res.body.errMsg,
+                type: res.body.msgType
+              })
+            } else {
+              this.markdownData = res.body.content
+              this.markdownTitle = res.body.title
+            }
+          })
         }
       } else {
         this.mdEditable = false
@@ -248,6 +283,11 @@ export default {
     '$route': function(){
       this.initBtnSeen()
       this.initMarkdownPanel()
+      if(this.$route.params.panelType != "profile"){
+        this.getContents(this.$route.params.panelType)
+      } else {
+        // 请求profile的内容
+      }
     },
     'tableSeen': function() {
       this.markdownSeen = !this.tableSeen
@@ -271,9 +311,10 @@ export default {
     margin: 0 auto;
   }
   #controllerWrap{
-    background-color: rgba(255, 255,255, 0.9);
+    background-color: rgba(255, 255,255, 0.5);
     border: 0;
     border-radius: 4px;
+    /* padding: 5px; */
   }
   #controllerWrap>.el-row{
     height: 100%;

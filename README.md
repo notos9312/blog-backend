@@ -11,7 +11,7 @@ node server.js
 # install dependencies
 npm install
 
-# serve with hot reload at localhost:3000
+# serve with hot reload at localhost:3456
 npm run dev
 
 ```

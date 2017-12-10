@@ -9,13 +9,22 @@
       id="titleTable"
       :data="contentTitles"
       tooltip-effect="dark"
-      style="width:100%; text-align:center">
-        <el-table-column type="selection" width="55">
+      :default-sort = "{prop: 'createTime', order: 'ascending'}"
+      @row-click="clickRow"
+      style="width:100%; text-align:left">
+        <!-- <el-table-column type="selection" width="55">
+        </el-table-column> -->
+        <el-table-column label="类型" width="120">
+          <template slot-scope="scope">
+            <el-tag :type="getTagType(scope.row.contentType)" size="medium">{{ getContentTypeInCn(scope.row.contentType) }}</el-tag>
+          </template>
         </el-table-column>
-        <el-table-column prop="createDate" label="日期" width="120">
+        <el-table-column prop="title" label="标题" sortable show-overflow-tooltip>
         </el-table-column>
-        <el-table-column prop="title" label="标题" show-overflow-tooltip>
+        <el-table-column prop="createDate" label="发布日期" sortable width="120">
         </el-table-column>
+        <!-- <el-table-column prop="title" label="标题" show-overflow-tooltip>
+        </el-table-column> -->
       </el-table>
     </div>
   </div>
@@ -26,7 +35,8 @@ export default {
   props:['panelType', 'tableSeen', 'contentTitles'],
   data() {
     return {
-      mTitles: []
+      mTitles: [],
+      titleObj: {},
     }
   },
   methods: {
@@ -36,6 +46,43 @@ export default {
       var month = mDate.getMonth() + 1
       var date = mDate.getDate()
       return year+'-'+month+'-'+date
+    },
+    getContentTypeInCn: function(contentType){
+      switch(contentType) {
+        case "articles":
+          return "文章"
+          break
+        case "essays":
+          return "随笔"
+          break
+        case "notes":
+          return "笔记"
+          break
+        default:
+          return contentType
+          break
+      }
+    },
+    getTagType: function(contentType){
+      switch(contentType) {
+        case "articles":
+          return ""
+          break
+        case "essays":
+          return "success"
+          break
+        case "notes":
+          return "warning"
+          break
+        default:
+          return ""
+          break
+      }
+    },
+    clickRow: function(row, event, colume) {
+      // console.log(row)
+      this.titleObj = row
+      this.$router.push({path: '/controller/'+this.$route.params.panelType, query:{opt:'browse', objid:this.titleObj.objectId}})
     }
   },
   watch: {
@@ -57,7 +104,6 @@ export default {
 
 <style>
   .el-table th {
-    text-align: center;
     cursor: default;
   }
   .el-table tr {
