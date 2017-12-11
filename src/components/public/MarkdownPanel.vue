@@ -1,26 +1,35 @@
 <template>
   <div id="markdownPanelVue" v-if="markdownSeen">
     <div id="title" style="text-align:left; padding-bottom: 10px;">
-      <el-input v-model="titleData" :disabled="!editabel" style="width:100%;" id="titleText" placeholder="请输入标题"></el-input>
+      <el-input
+        v-model="titleData"
+        :autofocus="titleData.length > 0"
+        :disabled="!editable"
+        :required="true"
+        style="width:100%;"
+        id="titleText"
+        placeholder="请输入标题"></el-input>
     </div>
     <mavon-editor
       v-model="mdData"
       :toolbarsFlag="toolbarsFlag"
-      :subfield="subfield"
+      :subfield="false"
       :default_open="default_open"
       :toolbars="toolbarsObj"
+      :editable="isEdit"
+      @subfieldtoggle="subfieldtoggle"
       ref="md"> </mavon-editor>
   </div>
 </template>
 
 <script>
 export default {
-  props: ['panelType', 'markdownSeen', 'mTitle', 'value', 'editabel'],
+  props: ['panelType', 'markdownSeen', 'contentObj', 'editable'],
   data() {
     return {
-      titleData: '',
-      mdData: this.value,
-      isEdit: this.editabel,
+      titleData: this.contentObj.title,
+      mdData: this.contentObj.content,
+      isEdit: this.editable,
       toolbarsFlag: false,
       subfield: false,
       default_open: 'preview',
@@ -57,26 +66,37 @@ export default {
       },
     }
   },
+  methods:{
+    subfieldtoggle: function(status, value) {
+      console.log('status:'+status)
+      if(!status) {
+        this.default_open = 'edit'
+        this.isEdit = true
+        console.log('default_open:'+this.default_open+', status:'+status)
+        this.$refs.md.$refs.toolbar_right.$clicks('preview')
+      }
+    }
+  },
   watch: {
-    'mTitle': function(){
-      this.titleData = this.mTitle
+    'contentObj': function(){
+      this.titleData = this.contentObj.title
+      this.mdData = this.contentObj.content
     },
-    'value': function(){
-      this.mdData = this.value
-    },
-    'editabel': function() {
-      this.isEdit = this.editabel
-      console.log('watch editable: '+this.editabel)
+    'editable': function() {
+      this.isEdit = this.editable
+      console.log('watch editable: '+this.editable)
     },
     'isEdit': function() {
       console.log('watch isEdit: '+this.isEdit)
       if(this.isEdit) {
         this.toolbarsFlag = true
-        this.subfield = true
+        // this.subfield = true
         this.default_open = 'edit'
+        console.log('subfield: '+this.subfield)
+        // this.$refs.md.$refs.toolbar_right.$clicks('subfield')
       } else {
         this.toolbarsFlag = false
-        this.subfield = false
+        // this.subfield = false
         this.default_open = 'preview'
       }
     }

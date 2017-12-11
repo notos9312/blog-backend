@@ -49,20 +49,22 @@
                 </ul>
               </div>
             </div>
-            <el-main id="optPanel">
-              <table-panel
-                ref="titleTable"
-                :tableSeen="tableSeen"
-                :panelType="panelType"
-                :contentTitles="titleData" ></table-panel>
-
-              <markdown-panel
-                ref="markdown"
-                :mTitle="markdownTitle"
-                :value="markdownData"
-                :editabel="mdEditable"
-                :markdownSeen="markdownSeen"
-                :panelType="panelType" ></markdown-panel>
+            <el-main id="optPanel" v-loading="loading">
+              <transition name="fade">
+                <table-panel
+                  ref="titleTable"
+                  :tableSeen="tableSeen"
+                  :panelType="panelType"
+                  :contentTitles="titleData" ></table-panel>
+              </transition>
+              <transition name="fade">
+                <markdown-panel
+                  ref="markdown"
+                  :contentObj="contentObj"
+                  :editable="mdEditable"
+                  :markdownSeen="markdownSeen"
+                  :panelType="panelType" ></markdown-panel>
+              </transition>
             </el-main>
           </el-col>
         </el-row>
@@ -107,6 +109,7 @@ export default {
   data() {
     return {
       hello: 'hello?',
+      loading: true,
       createSeen: true,
       editSeen: false,
       cancelSeen: false,
@@ -116,6 +119,7 @@ export default {
       markdownSeen: false,
       markdownTitle: '',
       markdownData: '',
+      contentObj: {title: '', content: ''},
       mdEditable: false,
       titleData: [],
     }
@@ -125,8 +129,7 @@ export default {
       this.$message("click avatar")
     },
     clickCreate: function() {
-      this.titleData = ''
-      this.markdownData = ''
+      this.contentObj = {title: '', content: ''}
       this.mdEditable = true
       this.$router.push({path: '/controller/'+this.$route.params.panelType, query:{opt:'create'}})
     },
@@ -151,6 +154,10 @@ export default {
       var mdObjId = this.$route.query.objid
       console.log(mdTitle)
       console.log(mdContent)
+      if(mdTitle == '' || mdContent == ''){
+        this.$message.error('标题或内容不能为空！')
+        return
+      }
       if (this.$route.query.opt == 'create'){  // 新增内容
         if (this.$route.params.panelType != 'all' || this.$route.params.panelType != 'profile') {
           var mdCreateTime = new Date().getTime()
@@ -161,10 +168,12 @@ export default {
             createTime: mdCreateTime,
             contentType: mdContentType
           }
+          this.loading = true
           this.$http.post('/api/createContent', postData, {emulateJSON:true})
           .then(res => {
             console.log(res.body)
             var sucData = res.body
+            _this.loading = false
             _this.$message({
               message: sucData.errMsg,
               type: sucData.msgType
@@ -172,6 +181,7 @@ export default {
             _this.$router.push('/controller/'+_this.$route.params.panelType)
           }, err => {
             console.log(err.status)
+            _this.loading = false
             _this.$message.error('请求错误：'+err.status)
           })
         } else if(this.$route.params.panelType == 'profile') {  // 保存个人资料
@@ -184,10 +194,12 @@ export default {
           content: mdContent,
           objectId: mdObjId
         }
+        this.loading = true
         this.$http.post('/api/updateContent', postData, {emulateJSON:true})
         .then(res => {
           console.log(res.body)
           var sucData = res.body
+          _this.loading = false
           _this.$message({
             message: sucData.errMsg,
             type: sucData.msgType
@@ -195,7 +207,8 @@ export default {
           _this.$router.push('/controller/'+_this.$route.params.panelType)
         }, err => {
           console.log(err.status)
-            _this.$message.error('请求错误：'+err.status)
+          _this.loading = false
+          _this.$message.error('请求错误：'+err.status)
         })
       }
     },
@@ -242,18 +255,23 @@ export default {
           this.setBtnSeen(false, true, false, false, false)
           this.tableSeen = false
           this.mdEditable = false
+          this.loading = true
           // console.log(this.$refs.titleTable.titleObj) //this.$route.query.objid this.$refs.titleTable.titleObj.objectId
           this.$http.post('/api/getTheContent', {objectId: this.$route.query.objid}, {emulateJSON:true})
           .then(res => {
-            if(res.body.hasOwnProperty("errCode") && res.body.errCode == 0){
+            _this.loading = false
+            if(res.body.hasOwnProperty("errCode") && res.body.errCode != 0){
               _this.$message({
                 message: res.body.errMsg,
                 type: res.body.msgType
               })
             } else {
-              this.markdownData = res.body.content
-              this.markdownTitle = res.body.title
+              this.contentObj = res.body
             }
+          }, err => {
+            console.log(err.status)
+            _this.loading = false
+            _this.$message.error('请求错误：'+err.status)
           })
         }
       } else {
@@ -262,9 +280,11 @@ export default {
     },
     getContents: function(type) {
       var _this = this
+      this.loading = true
       this.$http.post('/api/getContents', {contentType: type}, {emulateJSON:true})
       .then(res => {
         //res
+        _this.loading = false
         if(res.body.hasOwnProperty("errCode")){
           _this.$message({
             message: res.body.errMsg,
@@ -275,6 +295,7 @@ export default {
         }
       }, err => {
         console.log(err.status)
+        _this.loading = false
         _this.$message.error('请求错误：'+err.status)
       })
     }
@@ -387,6 +408,12 @@ export default {
 <style>
   .el-submenu__title {
     font-size: 18px;
+  }
+  .fade-enter-active, .fade-leave-active {
+    transition: opacity .5s
+  }
+  .fade-enter, .fade-leave-to /* .fade-leave-active in below version 2.1.8 */ {
+    opacity: 0
   }
 </style>
 
