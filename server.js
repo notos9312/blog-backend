@@ -148,6 +148,26 @@ app.post('/api/updateContent', urlencodedParser, function(req, res){
   })
 })
 
+app.post('/api/deleteContent', urlencodedParser, function(req, res){
+  var deleteObjId = req.body.objectId
+  var whereStr = {objectId: deleteObjId}
+  Content.findByIdAndRemove(deleteObjId, function(contentError, contentResult){
+    if(contentError) {
+      console.log(contentError)
+      res.send(JSON.stringify({ errCode: 999, errMsg: '数据库查询出错', msgType: 'error' }))
+    } else {
+      ContentTitle.remove(whereStr, function(titleError, titleResult){
+        if(titleError){
+          console.log(titleError)
+          res.send(JSON.stringify({ errCode: 999, errMsg: '数据库查询出错', msgType: 'error' }))
+        } else{
+          res.send(JSON.stringify({ errCode: 0, errMsg: '操作成功', msgType: 'success' }))
+        }
+      })
+    }
+  })
+})
+
 // 定义插入内容函数
 function insertContent(contentData, callback) {
   var data = new Content(contentData)

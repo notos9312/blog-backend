@@ -39,6 +39,11 @@
           </el-col>
           <el-col id="rightOpt" :span="17" style="box-sizing:border-box; padding-top:90px;">
             <div id="optNav" style="color:#fff;">
+              <div id="backBtn">
+                <ul>
+                  <li v-if="backSeen"><el-button type="danger" icon="el-icon-back" @click="clickBack()">返回</el-button></li>
+                </ul>
+              </div>
               <div id="optBtn">
                 <ul>
                   <li v-if="createSeen"><el-button type="success" icon="el-icon-circle-plus-outline" @click="clickCreate()">新增</el-button></li>
@@ -89,12 +94,6 @@ export default {
   },
   created: function() {
     // this.$router.push('/controller/'+this.$route.params.panelType)
-    this.initBtnSeen()
-    this.initMarkdownPanel()
-
-    console.log('created')
-  },
-  mounted: function(){
     if(this.$route.query.opt == 'edit') {
       this.$router.push({
         path: '/controller/'+this.$route.params.panelType,
@@ -106,10 +105,15 @@ export default {
       // 请求profile的内容
     }
   },
+  mounted: function(){
+    this.initBtnSeen()
+    this.initMarkdownPanel()
+  },
   data() {
     return {
       hello: 'hello?',
       loading: true,
+      backSeen: true,
       createSeen: true,
       editSeen: false,
       cancelSeen: false,
@@ -133,14 +137,18 @@ export default {
       this.mdEditable = true
       this.$router.push({path: '/controller/'+this.$route.params.panelType, query:{opt:'create'}})
     },
+    clickBack: function() {
+      this.$router.go(-1)
+    },
     clickCancel: function() {
       var _this = this
-      this.$confirm('将不做任何修改直接返回内容列表，是否继续？', '提示', {
+      this.$confirm('将不做任何修改直接返回，是否继续？', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
         type: 'warning'
       }).then(()=>{
-        _this.$router.push('/controller/'+this.$route.params.panelType)
+        // _this.$router.push('/controller/'+this.$route.params.panelType)
+        _this.$router.go(-1)
       }).catch(()=>{})
     },
     clickEdit: function() {
@@ -212,10 +220,14 @@ export default {
         })
       }
     },
+    clickDelete: function(){
+
+    },
     firstToUpperCase: function(str) {
       return str.substring(0,1).toUpperCase() + str.substring(1)
     },
-    setBtnSeen: function(createSeen, editSeen, cancelSeen, saveSeen, deleteSeen){
+    setBtnSeen: function(backSeen, createSeen, editSeen, cancelSeen, saveSeen, deleteSeen){
+      this.backSeen = backSeen
       this.createSeen = createSeen
       this.editSeen = editSeen
       this.cancelSeen = cancelSeen
@@ -225,20 +237,20 @@ export default {
     initBtnSeen: function(){
       if(JSON.stringify(this.$route.query) != "{}"){
         if (this.$route.query.opt == 'create' || this.$route.query.opt == 'edit'){
-          this.setBtnSeen(false, false, true, true, false)
+          this.setBtnSeen(false, false, false, true, true, false)
           this.tableSeen = false
         }
       }else {
         switch (this.$route.params.panelType) {
           case "all":
-            this.setBtnSeen(false, false, false, false, false)
+            this.setBtnSeen(false, false, false, false, false, false)
             this.tableSeen = true
             break;
           case "articles":
           case "essays":
           case "notes":
           case "profile":
-            this.setBtnSeen(true, false, false, false, false)
+            this.setBtnSeen(false, true, false, false, false, false)
             this.tableSeen = true
             break;
         }
@@ -252,7 +264,7 @@ export default {
         } else if(this.$route.query.opt == 'edit') {
           this.mdEditable = true
         } else if(this.$route.query.opt == 'browse') {
-          this.setBtnSeen(false, true, false, false, false)
+          this.setBtnSeen(true, false, true, false, false, false)
           this.tableSeen = false
           this.mdEditable = false
           this.loading = true
@@ -369,11 +381,14 @@ export default {
     border: 0;
     border-radius: 0 4px 0 0;
   }
+  #backBtn {
+    float: left;
+  }
   #optBtn {
     float:right;
     /* margin:30px 30px 0 0; */
   }
-  #optBtn ul li {
+  #optBtn ul li, #backBtn ul li {
     list-style: none;
     float: left;
     margin: 12px 30px 0 0;
