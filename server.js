@@ -38,7 +38,7 @@ app.post('/api/login', urlencodedParser, function(req, res){
     if (error) {
       res.send(JSON.stringify({ errCode: 999, errMsg: '数据库查询出错', msgType: 'error' }))
     } else {
-      if (result[0].password === verify_password) {
+      if (result.length > 0 && (result[0].password === verify_password)) {
         res.send(JSON.stringify({ errCode: 0, errMsg: '操作成功', msgType: 'success'}))
       } else {
         res.send(JSON.stringify({ errCode: 1, errMsg: '用户名或密码错误', msgType: 'error'}))
