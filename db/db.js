@@ -1,5 +1,5 @@
 var mongoose = require('mongoose')
-var DB_URL = 'mongodb://59.110.136.203:27017/not-blog';
+var DB_URL = 'mongodb://127.0.0.1:27017/not-blog';
 
 mongoose.Promise = global.Promise;
 
