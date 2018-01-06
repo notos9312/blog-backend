@@ -1,6 +1,6 @@
 # blog-backend
 
-> This the backend of Notos's blog
+> This is the backend of Notos's blog
 
 ## Build Setup
 
