@@ -28,6 +28,17 @@ app.get('/api/hello', function(req, res){
   // })
 })
 
+// app.post('/api/addUser', urlencodedParser, function(req, res){
+//   var userData = req.body
+//   insertUser(userData, function(error, result){
+//     if (error) {
+//       res.send(JSON.stringify({ errCode: 999, errMsg: '数据库查询出错', msgType: 'error' }))
+//     } else {
+//       res.send(JSON.stringify({ errCode: 0, errMsg: '操作成功', msgType: 'success'}))
+//     }
+//   })
+// })
+
 app.post('/api/login', urlencodedParser, function(req, res){
   var verify_username = req.body.username
   var verify_password = req.body.password
@@ -167,6 +178,12 @@ app.post('/api/deleteContent', urlencodedParser, function(req, res){
     }
   })
 })
+
+// 定义新建用户函数
+function insertUser(userData, callback) {
+  var data = new User(userData)
+  data.save(callback);
+}
 
 // 定义插入内容函数
 function insertContent(contentData, callback) {

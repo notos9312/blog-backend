@@ -1,18 +1,24 @@
 var mongoose = require('mongoose')
-var DB_URL = 'mongodb://127.0.0.1:27017/not-blog';
+
+var DB_PROTOCOL = 'mongodb://';
+var DB_USER = 'notBlogReadWrite';
+var DB_PWD = '3y40k9dh';
+var DB_IP = '59.110.136.203';
+var DB_PORT = '27017';
+var DB_DBNAME = '/notBlog';
 
 mongoose.Promise = global.Promise;
 
 /**
  * 连接
  */
-mongoose.connect(DB_URL, {useMongoClient:true});
+mongoose.connect(DB_PROTOCOL+DB_USER+':'+DB_PWD+'@'+DB_IP+':'+DB_PORT+DB_DBNAME, {useMongoClient:true});
 
 /**
  * 连接成功
  */
 mongoose.connection.on('connected', function () {
-  console.log('Mongoose connection open to ' + DB_URL);
+  console.log('Mongoose connection open to ' + DB_IP+':'+DB_PORT+DB_DBNAME);
 });
 
 /**

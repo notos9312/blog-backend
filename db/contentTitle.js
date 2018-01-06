@@ -10,4 +10,4 @@ var contentTitleSchema = new Schema({
   objectId: String
 })
 
-module.exports = mongoose.model('Content_title',contentTitleSchema);
+module.exports = mongoose.model('ContentTitle', contentTitleSchema, 'contentTitles');
