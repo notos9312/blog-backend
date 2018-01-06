@@ -17,8 +17,8 @@
       @selection-change="selectionChange"
       @sort-change="sortChange"
       style="width:100%; text-align:left">
-        <el-table-column type="selection" width="55">
-        </el-table-column>
+        <!-- <el-table-column type="selection" width="55">
+        </el-table-column> -->
         <el-table-column label="类型" width="120">
           <template slot-scope="scope">
             <el-tag :type="getTagType(scope.row.contentType)" size="medium">{{ getContentTypeInCn(scope.row.contentType) }}</el-tag>
