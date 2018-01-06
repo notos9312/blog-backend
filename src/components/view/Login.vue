@@ -87,7 +87,16 @@ export default {
         console.log(err.status)
         _this.$message.error('请求错误：'+err.status)
       })
-    }
+    },
+    // getHello() {
+    //   var _this = this
+    //   this.$http.get('/api/hello').then(res => {
+    //     console.log(res.body)
+    //   }, err => {
+    //     console.log(err.status)
+    //     _this.$message.error('请求错误：'+err.status)
+    //   })
+    // }
   },
   components: {
     NotFooter

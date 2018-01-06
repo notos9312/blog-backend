@@ -6,7 +6,7 @@
         <el-row>
           <el-col id="leftMenu" :span="7" style="box-sizing:border-box; padding-top:90px;">
             <div id="userMsg">
-              <div id="avatar" @click="clickAvatar()"><img width="100%" height="100%" src="../../assets/images/avatar.png" alt="my avatar"></div>
+              <div id="avatar" @click="clickAvatar()"><img width="100%" height="100%" src="http://qcdn.hinotos.com/avatar.png" alt="my avatar"></div>
             </div>
             <el-aside style="width:100%">
               <el-menu :default-openeds="['1', '2']"
