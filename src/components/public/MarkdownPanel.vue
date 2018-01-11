@@ -125,6 +125,12 @@ export default {
 <style>
   .v-note-show {
     text-align: left;
+    width: 100%;
+  }
+
+.markdown-body p img {
+    display: block;
+    margin: 0 auto;
   }
 </style>
 
