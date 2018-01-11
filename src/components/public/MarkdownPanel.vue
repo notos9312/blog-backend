@@ -128,9 +128,14 @@ export default {
     width: 100%;
   }
 
-.markdown-body p img {
+  .markdown-body p img {
     display: block;
     margin: 0 auto;
+  }
+
+  .markdown-body p {
+    font-size: 16px;
+    font-family: Manuale,Source Han Serif SC,Noto Serif CJK SC,Songti SC,serif;
   }
 </style>
 
