@@ -81,37 +81,38 @@
 </template>
 
 <script>
-import NotFooter from '@/components/public/NotFooter'
-import TablePanel from '@/components/public/TablePanel'
-import MarkdownPanel from '@/components/public/MarkdownPanel'
+import NotFooter from "@/components/public/NotFooter";
+import TablePanel from "@/components/public/TablePanel";
+import MarkdownPanel from "@/components/public/MarkdownPanel";
 
 export default {
-  props:['panelType'],
+  props: ["panelType"],
   components: {
     NotFooter,
     TablePanel,
-    MarkdownPanel,
+    MarkdownPanel
   },
   created: function() {
     // this.$router.push('/controller/'+this.$route.params.panelType)
-    if(this.$route.query.opt == 'edit') {
+    if (this.$route.query.opt == "edit") {
       this.$router.push({
-        path: '/controller/'+this.$route.params.panelType,
-        query:{opt:'browse', objid:this.$route.query.objid}})
+        path: "/controller/" + this.$route.params.panelType,
+        query: { opt: "browse", objid: this.$route.query.objid }
+      });
     }
-    if(this.$route.params.panelType != "profile"){
-      this.getContents(this.$route.params.panelType)
+    if (this.$route.params.panelType != "profile") {
+      this.getContents(this.$route.params.panelType);
     } else {
       // 请求profile的内容
     }
   },
-  mounted: function(){
-    this.initBtnSeen()
-    this.initMarkdownPanel()
+  mounted: function() {
+    this.initBtnSeen();
+    this.initMarkdownPanel();
   },
   data() {
     return {
-      hello: 'hello?',
+      hello: "hello?",
       loading: true,
       backSeen: true,
       createSeen: true,
@@ -121,314 +122,374 @@ export default {
       deleteSeen: true,
       tableSeen: true,
       markdownSeen: false,
-      markdownTitle: '',
-      markdownData: '',
-      contentObj: {title: '', content: ''},
+      markdownTitle: "",
+      markdownData: "",
+      contentObj: { title: "", content: "" },
       mdEditable: false,
-      titleData: [],
-    }
+      titleData: []
+    };
   },
   methods: {
     clickAvatar: function() {
-      this.$message("click avatar")
+      this.$message("click avatar");
     },
     clickCreate: function() {
-      this.contentObj = {title: '', content: ''}
-      this.mdEditable = true
-      this.$router.push({path: '/controller/'+this.$route.params.panelType, query:{opt:'create'}})
+      this.contentObj = { title: "", content: "" };
+      this.mdEditable = true;
+      this.$router.push({
+        path: "/controller/" + this.$route.params.panelType,
+        query: { opt: "create" }
+      });
     },
     clickBack: function() {
-      this.$router.go(-1)
+      this.$router.go(-1);
     },
     clickCancel: function() {
-      var _this = this
-      this.$confirm('将不做任何修改直接返回，是否继续？', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(()=>{
-        // _this.$router.push('/controller/'+this.$route.params.panelType)
-        _this.$router.go(-1)
-      }).catch(()=>{})
+      var _this = this;
+      this.$confirm("将不做任何修改直接返回，是否继续？", "提示", {
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        type: "warning"
+      })
+        .then(() => {
+          // _this.$router.push('/controller/'+this.$route.params.panelType)
+          _this.$router.go(-1);
+        })
+        .catch(() => {});
     },
     clickEdit: function() {
-      var _this = this
-      this.$router.push({path: '/controller/'+this.$route.params.panelType, query:{opt:'edit', objid:this.$route.query.objid}})
+      var _this = this;
+      this.$router.push({
+        path: "/controller/" + this.$route.params.panelType,
+        query: { opt: "edit", objid: this.$route.query.objid }
+      });
     },
     clickSave: function() {
-      var _this = this
-      var mdTitle = this.$refs.markdown.titleData
-      var mdContent = this.$refs.markdown.mdData
-      var mdObjId = this.$route.query.objid
-      console.log(mdTitle)
-      console.log(mdContent)
-      if(mdTitle == '' || mdContent == ''){
-        this.$message.error('标题或内容不能为空！')
-        return
+      var _this = this;
+      var mdTitle = this.$refs.markdown.titleData;
+      var mdContent = this.$refs.markdown.mdData;
+      var mdObjId = this.$route.query.objid;
+      console.log(mdTitle);
+      console.log(mdContent);
+      if (mdTitle == "" || mdContent == "") {
+        this.$message.error("标题或内容不能为空！");
+        return;
       }
-      if (this.$route.query.opt == 'create'){  // 新增内容
-        if (this.$route.params.panelType != 'all' || this.$route.params.panelType != 'profile') {
-          var mdCreateTime = new Date().getTime()
-          var mdContentType = this.$route.params.panelType
-          var postData = {
+      if (this.$route.query.opt == "create") {
+        // 新增内容
+        if (
+          this.$route.params.panelType != "all" ||
+          this.$route.params.panelType != "profile"
+        ) {
+          var mdCreateTime = new Date().getTime();
+          var mdContentType = this.$route.params.panelType;
+          var createContentData = {
             title: mdTitle,
             content: mdContent,
             createTime: mdCreateTime,
             contentType: mdContentType
-          }
-          this.loading = true
-          this.$http.post('/api/createContent', postData, {emulateJSON:true})
-          .then(res => {
-            console.log(res.body)
-            var sucData = res.body
-            _this.loading = false
-            _this.$message({
-              message: sucData.errMsg,
-              type: sucData.msgType
-            })
-            _this.$router.push('/controller/'+_this.$route.params.panelType)
-          }, err => {
-            console.log(err.status)
-            _this.loading = false
-            _this.$message.error('请求错误：'+err.status)
-          })
-        } else if(this.$route.params.panelType == 'profile') {  // 保存个人资料
-
+          };
+          this.createContent(createContentData);
+        } else if (this.$route.params.panelType == "profile") {
+          // 保存个人资料
         }
-      } else if(this.$route.query.opt == 'edit') {  // 保存内容
+      } else if (this.$route.query.opt == "edit") {
+        // 保存内容
         //
-        var postData = {
+        var updateContentData = {
           title: mdTitle,
           content: mdContent,
           objectId: mdObjId
-        }
-        this.loading = true
-        this.$http.post('/api/updateContent', postData, {emulateJSON:true})
-        .then(res => {
-          console.log(res.body)
-          var sucData = res.body
-          _this.loading = false
-          _this.$message({
-            message: sucData.errMsg,
-            type: sucData.msgType
-          })
-          _this.$router.push('/controller/'+_this.$route.params.panelType)
-        }, err => {
-          console.log(err.status)
-          _this.loading = false
-          _this.$message.error('请求错误：'+err.status)
-        })
+        };
+        this.updateContent(updateContentData);
       }
     },
-    clickDelete: function(){
-
-    },
+    clickDelete: function() {},
     firstToUpperCase: function(str) {
-      return str.substring(0,1).toUpperCase() + str.substring(1)
+      return str.substring(0, 1).toUpperCase() + str.substring(1);
     },
-    setBtnSeen: function(backSeen, createSeen, editSeen, cancelSeen, saveSeen, deleteSeen){
-      this.backSeen = backSeen
-      this.createSeen = createSeen
-      this.editSeen = editSeen
-      this.cancelSeen = cancelSeen
-      this.saveSeen = saveSeen
-      this.deleteSeen = deleteSeen
+    setBtnSeen: function(
+      backSeen,
+      createSeen,
+      editSeen,
+      cancelSeen,
+      saveSeen,
+      deleteSeen
+    ) {
+      this.backSeen = backSeen;
+      this.createSeen = createSeen;
+      this.editSeen = editSeen;
+      this.cancelSeen = cancelSeen;
+      this.saveSeen = saveSeen;
+      this.deleteSeen = deleteSeen;
     },
-    initBtnSeen: function(){
-      if(JSON.stringify(this.$route.query) != "{}"){
-        if (this.$route.query.opt == 'create' || this.$route.query.opt == 'edit'){
-          this.setBtnSeen(false, false, false, true, true, false)
-          this.tableSeen = false
+    initBtnSeen: function() {
+      if (JSON.stringify(this.$route.query) != "{}") {
+        if (
+          this.$route.query.opt == "create" ||
+          this.$route.query.opt == "edit"
+        ) {
+          this.setBtnSeen(false, false, false, true, true, false);
+          this.tableSeen = false;
         }
-      }else {
+      } else {
         switch (this.$route.params.panelType) {
           case "all":
-            this.setBtnSeen(false, false, false, false, false, false)
-            this.tableSeen = true
+            this.setBtnSeen(false, false, false, false, false, false);
+            this.tableSeen = true;
             break;
           case "articles":
           case "essays":
           case "notes":
           case "profile":
-            this.setBtnSeen(false, true, false, false, false, false)
-            this.tableSeen = true
+            this.setBtnSeen(false, true, false, false, false, false);
+            this.tableSeen = true;
             break;
         }
       }
     },
     initMarkdownPanel: function() {
-      var _this = this
-      if(JSON.stringify(this.$route.query) != "{}") {  // 新增或者编辑的情况
-        if (this.$route.query.opt == 'create'){
-          this.mdEditable = true
-        } else if(this.$route.query.opt == 'edit') {
-          this.mdEditable = true
-        } else if(this.$route.query.opt == 'browse') {
-          this.setBtnSeen(true, false, true, false, false, false)
-          this.tableSeen = false
-          this.mdEditable = false
-          this.loading = true
-          // console.log(this.$refs.titleTable.titleObj) //this.$route.query.objid this.$refs.titleTable.titleObj.objectId
-          this.$http.post('/api/getTheContent', {objectId: this.$route.query.objid}, {emulateJSON:true})
-          .then(res => {
-            _this.loading = false
-            if(res.body.hasOwnProperty("errCode") && res.body.errCode != 0){
-              _this.$message({
-                message: res.body.errMsg,
-                type: res.body.msgType
-              })
-            } else {
-              this.contentObj = res.body
-            }
-          }, err => {
-            console.log(err.status)
-            _this.loading = false
-            _this.$message.error('请求错误：'+err.status)
-          })
+      var _this = this;
+      if (JSON.stringify(this.$route.query) != "{}") {
+        // 新增或者编辑的情况
+        if (this.$route.query.opt == "create") {
+          this.mdEditable = true;
+        } else if (this.$route.query.opt == "edit") {
+          this.mdEditable = true;
+        } else if (this.$route.query.opt == "browse") {
+          var getTheContentData = { objectId: this.$route.query.objid };
+          this.getTheContent(getTheContentData);
         }
       } else {
-        this.mdEditable = false
+        this.mdEditable = false;
       }
     },
     getContents: function(type) {
-      var _this = this
-      this.loading = true
-      this.$http.post('/api/getContents', {contentType: type}, {emulateJSON:true})
-      .then(res => {
-        //res
-        _this.loading = false
-        if(res.body.hasOwnProperty("errCode")){
-          _this.$message({
-            message: res.body.errMsg,
-            type: res.body.msgType
-          })
-        } else {
-          this.titleData = res.body
-        }
-      }, err => {
-        console.log(err.status)
-        _this.loading = false
-        _this.$message.error('请求错误：'+err.status)
-      })
+      var _this = this;
+      this.loading = true;
+      this.$http
+        .post(
+          "http://localhost:2333/api/getContents",
+          { contentType: type },
+          { emulateJSON: true }
+        )
+        .then(
+          res => {
+            //res
+            _this.loading = false;
+            if (res.body.hasOwnProperty("errCode")) {
+              _this.$message({
+                message: res.body.errMsg,
+                type: res.body.msgType
+              });
+            } else {
+              this.titleData = res.body;
+            }
+          },
+          err => {
+            console.log(err.status);
+            _this.loading = false;
+            _this.$message.error("请求错误：" + err.status);
+          }
+        );
+    },
+    getTheContent: function(data) {
+      var _this = this;
+      this.setBtnSeen(true, false, true, false, false, false);
+      this.tableSeen = false;
+      this.mdEditable = false;
+      this.loading = true;
+      this.$http
+        .post("http://localhost:2333/api/getTheContent", data, {
+          emulateJSON: true
+        })
+        .then(
+          res => {
+            _this.loading = false;
+            if (res.body.hasOwnProperty("errCode") && res.body.errCode != 0) {
+              _this.$message({
+                message: res.body.errMsg,
+                type: res.body.msgType
+              });
+            } else {
+              this.contentObj = res.body;
+            }
+          },
+          err => {
+            console.log(err.status);
+            _this.loading = false;
+            _this.$message.error("请求错误：" + err.status);
+          }
+        );
+    },
+    updateContent: function(data) {
+      var _this = this;
+      this.loading = true;
+      this.$http
+        .post("http://localhost:2333/api/updateContent", postData, { emulateJSON: true })
+        .then(
+          res => {
+            console.log(res.body);
+            var sucData = res.body;
+            _this.loading = false;
+            _this.$message({
+              message: sucData.errMsg,
+              type: sucData.msgType
+            });
+            _this.$router.push("/controller/" + _this.$route.params.panelType);
+          },
+          err => {
+            console.log(err.status);
+            _this.loading = false;
+            _this.$message.error("请求错误：" + err.status);
+          }
+        );
+    },
+    createContent: function(data) {
+      var _this = this;
+      this.loading = true;
+      this.$http
+        .post("http://localhost:2333/api/createContent", postData, { emulateJSON: true })
+        .then(
+          res => {
+            console.log(res.body);
+            var sucData = res.body;
+            _this.loading = false;
+            _this.$message({
+              message: sucData.errMsg,
+              type: sucData.msgType
+            });
+            _this.$router.push("/controller/" + _this.$route.params.panelType);
+          },
+          err => {
+            console.log(err.status);
+            _this.loading = false;
+            _this.$message.error("请求错误：" + err.status);
+          }
+        );
     }
   },
   watch: {
-    '$route': function(){
-      this.initBtnSeen()
-      this.initMarkdownPanel()
-      if(this.$route.params.panelType != "profile"){
-        this.getContents(this.$route.params.panelType)
+    $route: function() {
+      this.initBtnSeen();
+      this.initMarkdownPanel();
+      if (this.$route.params.panelType != "profile") {
+        this.getContents(this.$route.params.panelType);
       } else {
         // 请求profile的内容
       }
     },
-    'tableSeen': function() {
-      this.markdownSeen = !this.tableSeen
+    tableSeen: function() {
+      this.markdownSeen = !this.tableSeen;
     }
   }
-}
+};
 </script>
 
 <style scoped>
-  #controllerVue {
-    height: 100%;
-    margin: 0 auto;
-    text-align: center;
-    font-family: "Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei","微软雅黑",Arial,sans-serif;
-  }
-  #controllerVue>.el-row {
-    position: relative;
-    top: 5%;
-    width: 100%;
-    height: 86%;
-    margin: 0 auto;
-  }
-  #controllerWrap{
-    background-color: rgba(255, 255,255, 0.5);
-    border: 0;
-    border-radius: 4px;
-    /* padding: 5px; */
-  }
-  #controllerWrap>.el-row{
-    height: 100%;
-  }
-  .el-col {
-    height: 100%;
-  }
-  #userMsg {
-    position: absolute;
-    top: 0;
-    height: 90px;
-    width: 29.2%;
-    background-color: rgba(64,158,255,0.8);
-    border: 0;
-    border-radius: 4px 0 0 0;
-  }
-  #avatar {
-    width: 80px;
-    height: 80px;
-    margin-top: 5px;
-    display:inline-block;
-    vertical-align: middle;
-    cursor: pointer;
-  }
-  #optNav {
-    position: absolute;
-    top: 0;
-    height: 90px;
-    width: 70.8%;
-    background-color: rgba(64,158,238,0.8);
-    border: 0;
-    border-radius: 0 4px 0 0;
-  }
-  #backBtn {
-    float: left;
-  }
-  #optBtn {
-    float:right;
-    /* margin:30px 30px 0 0; */
-  }
-  #optBtn ul li, #backBtn ul li {
-    list-style: none;
-    float: left;
-    margin: 12px 30px 0 0;
-  }
-  #optPanel {
-    height: 100%;
-    width: 100%;
-    background-color: white;
-    border: 0;
-    border-radius: 0 0 4px 0;
-  }
-  .el-aside {
-    height: 100%;
-    background-color: #EEF1F6;
-    border: 0;
-    border-radius: 0 0 0 4px;
-  }
-  .el-menu {
-    width: 100%;
-    border-right: 0;
-  }
-  a{
-    text-decoration: none;
-    color: #fff;
-  }
-  .router-link-active {
-    text-decoration: none;
-    color: #409EFF;
-  }
+#controllerVue {
+  height: 100%;
+  margin: 0 auto;
+  text-align: center;
+  font-family: "Helvetica Neue", Helvetica, "PingFang SC", "Hiragino Sans GB",
+    "Microsoft YaHei", "微软雅黑", Arial, sans-serif;
+}
+#controllerVue > .el-row {
+  position: relative;
+  top: 5%;
+  width: 100%;
+  height: 86%;
+  margin: 0 auto;
+}
+#controllerWrap {
+  background-color: rgba(255, 255, 255, 0.5);
+  border: 0;
+  border-radius: 4px;
+  /* padding: 5px; */
+}
+#controllerWrap > .el-row {
+  height: 100%;
+}
+.el-col {
+  height: 100%;
+}
+#userMsg {
+  position: absolute;
+  top: 0;
+  height: 90px;
+  width: 29.2%;
+  background-color: rgba(64, 158, 255, 0.8);
+  border: 0;
+  border-radius: 4px 0 0 0;
+}
+#avatar {
+  width: 80px;
+  height: 80px;
+  margin-top: 5px;
+  display: inline-block;
+  vertical-align: middle;
+  cursor: pointer;
+}
+#optNav {
+  position: absolute;
+  top: 0;
+  height: 90px;
+  width: 70.8%;
+  background-color: rgba(64, 158, 238, 0.8);
+  border: 0;
+  border-radius: 0 4px 0 0;
+}
+#backBtn {
+  float: left;
+}
+#optBtn {
+  float: right;
+  /* margin:30px 30px 0 0; */
+}
+#optBtn ul li,
+#backBtn ul li {
+  list-style: none;
+  float: left;
+  margin: 12px 30px 0 0;
+}
+#optPanel {
+  height: 100%;
+  width: 100%;
+  background-color: white;
+  border: 0;
+  border-radius: 0 0 4px 0;
+}
+.el-aside {
+  height: 100%;
+  background-color: #eef1f6;
+  border: 0;
+  border-radius: 0 0 0 4px;
+}
+.el-menu {
+  width: 100%;
+  border-right: 0;
+}
+a {
+  text-decoration: none;
+  color: #fff;
+}
+.router-link-active {
+  text-decoration: none;
+  color: #409eff;
+}
 </style>
 
 <style>
-  .el-submenu__title {
-    font-size: 18px;
-  }
-  .fade-enter-active, .fade-leave-active {
-    transition: opacity .5s
-  }
-  .fade-enter, .fade-leave-to /* .fade-leave-active in below version 2.1.8 */ {
-    opacity: 0
-  }
+.el-submenu__title {
+  font-size: 18px;
+}
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s;
+}
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
 </style>
 

@@ -62,16 +62,16 @@ export default {
           // console.log(md5(this.loginForm.password))
         } else {
           this.$message({
-            message: '没按要求输入',
+            message: '请按要求输入',
             type: 'warning'
           })
-          this.$router.push({path:'/test/123'})
+          // this.$router.push({path:'/test/123'})
         }
       })
     },
     postData(data) {
       var _this = this
-      this.$http.post('/api/login', {username:data.username, password:md5(data.password)}, {emulateJSON:true})
+      this.$http.post('http://localhost:2333/api/login', {username:data.username, password:md5(data.password)}, {emulateJSON:true})
       .then(res => {
         console.log(res.body)
         var sucData = res.body
@@ -88,15 +88,26 @@ export default {
         _this.$message.error('请求错误：'+err.status)
       })
     },
-    // getHello() {
-    //   var _this = this
-    //   this.$http.get('/api/hello').then(res => {
-    //     console.log(res.body)
-    //   }, err => {
-    //     console.log(err.status)
-    //     _this.$message.error('请求错误：'+err.status)
-    //   })
-    // }
+    getHello() {
+      var _this = this
+      this.$http.get('http://localhost:2333/api/hello').then(res => {
+        console.log(res.body)
+        _this.$message(res.body)
+      }, err => {
+        console.log(err.status)
+        _this.$message.error('请求错误：'+err.status)
+      })
+    },
+    postCheck() {
+      var _this = this
+      this.$http.post('http://localhost:2333/api/check').then(res => {
+        console.log(res.body);
+        _this.$message('请求成功')
+      }, err => {
+        console.log(err.status)
+        _this.$message.error('请求错误：'+err.status)
+      })
+    }
   },
   components: {
     NotFooter
