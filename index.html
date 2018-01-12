@@ -8,5 +8,13 @@
   <body style="height:100%; margin:0; background: url(http://qcdn.hinotos.com/bg.png) no-repeat fixed top center; background-size:cover; -webkit-background-size: cover;">
     <div id="app"></div>
     <!-- built files will be auto injected -->
+    <script>
+      window.onblur = function () {
+        document.title = "页面崩溃了，不信来看看";
+      };
+      window.onfocus = function () {
+        document.title = "南风有信-后管";
+      };
+    </script>
   </body>
 </html>
