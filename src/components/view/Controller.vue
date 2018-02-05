@@ -326,7 +326,7 @@ export default {
       var _this = this;
       this.loading = true;
       this.$http
-        .post("http://localhost:2333/api/updateContent", postData, { emulateJSON: true })
+        .post("http://localhost:2333/api/updateContent", data, { emulateJSON: true })
         .then(
           res => {
             console.log(res.body);
@@ -349,7 +349,7 @@ export default {
       var _this = this;
       this.loading = true;
       this.$http
-        .post("http://localhost:2333/api/createContent", postData, { emulateJSON: true })
+        .post("http://localhost:2333/api/createContent", data, { emulateJSON: true })
         .then(
           res => {
             console.log(res.body);
@@ -490,6 +490,9 @@ a {
 .fade-enter,
 .fade-leave-to {
   opacity: 0;
+}
+.v-show-content {
+  background-color: #ffffff !important;
 }
 </style>
 
