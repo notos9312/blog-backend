@@ -269,7 +269,7 @@ export default {
       this.loading = true;
       this.$http
         .post(
-          "http://localhost:2333/api/getContents",
+          "http://hinotos.com:2333/api/getContents",
           { contentType: type },
           { emulateJSON: true }
         )
@@ -300,7 +300,7 @@ export default {
       this.mdEditable = false;
       this.loading = true;
       this.$http
-        .post("http://localhost:2333/api/getTheContent", data, {
+        .post("http://hinotos.com:2333/api/getTheContent", data, {
           emulateJSON: true
         })
         .then(
@@ -326,7 +326,7 @@ export default {
       var _this = this;
       this.loading = true;
       this.$http
-        .post("http://localhost:2333/api/updateContent", data, { emulateJSON: true })
+        .post("http://hinotos.com:2333/api/updateContent", data, { emulateJSON: true })
         .then(
           res => {
             console.log(res.body);
@@ -349,7 +349,7 @@ export default {
       var _this = this;
       this.loading = true;
       this.$http
-        .post("http://localhost:2333/api/createContent", data, { emulateJSON: true })
+        .post("http://hinotos.com:2333/api/createContent", data, { emulateJSON: true })
         .then(
           res => {
             console.log(res.body);
