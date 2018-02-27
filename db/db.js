@@ -1,11 +1,11 @@
 var mongoose = require('mongoose')
 
 var DB_PROTOCOL = 'mongodb://';
-var DB_USER = 'username';
-var DB_PWD = 'password';
-var DB_IP = 'ipAddress';
+var DB_USER = 'notBlogReadWrite';
+var DB_PWD = '3y40k9dh';
+var DB_IP = '59.110.136.203';
 var DB_PORT = '27017';
-var DB_DBNAME = '/blogName';
+var DB_DBNAME = '/notBlog';
 
 mongoose.Promise = global.Promise;
 
