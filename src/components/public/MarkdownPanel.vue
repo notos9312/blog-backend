@@ -2,6 +2,7 @@
   <div id="markdownPanelVue" v-if="markdownSeen">
     <div id="title" style="text-align:left; padding-bottom: 10px;">
       <el-input
+        v-if="panelType != 'profile'"
         v-model="titleData"
         :autofocus="titleData.length > 0"
         :disabled="!editable"

@@ -6,6 +6,7 @@ var fs = require('fs')
 var Content = require('./db/content.js')
 var ContentTitle = require('./db/contentTitle.js')
 var User = require('./db/user.js')
+var Profile = require('./db/profile.js')
 
 var app = express()
 app.use(express.static(__dirname + '/src'))
@@ -29,16 +30,16 @@ app.post('/api/check', function(req, res){
   res.send(req)
 })
 
-// app.post('/api/addUser', urlencodedParser, function(req, res){
-//   var userData = req.body
-//   insertUser(userData, function(error, result){
-//     if (error) {
-//       res.send(JSON.stringify({ errCode: 999, errMsg: '数据库查询出错', msgType: 'error' }))
-//     } else {
-//       res.send(JSON.stringify({ errCode: 0, errMsg: '操作成功', msgType: 'success'}))
-//     }
-//   })
-// })
+app.post('/api/addUser', urlencodedParser, function(req, res){
+  var userData = req.body
+  insertUser(userData, function(error, result){
+    if (error) {
+      res.send(JSON.stringify({ errCode: 999, errMsg: '数据库查询出错', msgType: 'error' }))
+    } else {
+      res.send(JSON.stringify({ errCode: 0, errMsg: '操作成功', msgType: 'success'}))
+    }
+  })
+})
 
 app.post('/api/login', urlencodedParser, function(req, res){
   var verify_username = req.body.username
@@ -180,6 +181,43 @@ app.post('/api/deleteContent', urlencodedParser, function(req, res){
   })
 })
 
+// app.post('/api/addProfile', urlencodedParser, function(req, res){
+//   var profileData = req.body
+//   insertProfile(profileData, function (error, result) {
+//     if (error) {
+//       res.send(JSON.stringify({ errCode: 999, errMsg: '数据库查询出错', msgType: 'error' }))
+//     } else {
+//       res.send(JSON.stringify({ errCode: 0, errMsg: '操作成功', msgType: 'success' }))
+//     }
+//   })
+// })
+
+app.get('/api/getProfile', function(req, res){
+  Profile.find({}, function(error, result){
+    if(error){
+      console.log(error)
+      res.send(JSON.stringify({ errCode: 999, errMsg: '数据库查询出错', msgType: 'error' }))
+    } else {
+      // console.log(result)
+      res.send(result[0])
+    }
+  })
+})
+
+app.post('/api/updateProfile', urlencodedParser, function(req, res){
+  var profileObjId = req.body.objectId
+  var updateProfile = req.body.profile
+  var updateProfileStr = {profile: updateProfile}
+  Profile.findByIdAndUpdate(profileObjId, updateProfileStr, function(error, result){
+    if(error) {
+      console.log(error)
+      res.send(JSON.stringify({ errCode: 999, errMsg: '数据库查询出错', msgType: 'error' }))
+    } else {
+      res.send(JSON.stringify({ errCode: 0, errMsg: '操作成功', msgType: 'success' }))
+    }
+  })
+})
+
 // 定义新建用户函数
 function insertUser(userData, callback) {
   var data = new User(userData)
@@ -195,6 +233,12 @@ function insertContent(contentData, callback) {
 // 定义插入内容标题函数
 function insertContentTitle(titleData, callback) {
   var data = new ContentTitle(titleData)
+  data.save(callback)
+}
+
+// 定义新增Profile函数
+function insertProfile(profileData, callback) {
+  var data = new Profile(profileData)
   data.save(callback)
 }
 

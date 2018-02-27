@@ -31,7 +31,7 @@
                 <el-submenu index="2">
                   <template slot="title">个人资料</template>
                     <el-menu-item
-                    index="/controller/profile"
+                    index="/controller/profile?opt=browse"
                     style="padding-left:55px;">基本资料</el-menu-item>
                 </el-submenu>
               </el-menu>
@@ -125,6 +125,7 @@ export default {
       markdownTitle: "",
       markdownData: "",
       contentObj: { title: "", content: "" },
+      profileData: {},
       mdEditable: false,
       titleData: []
     };
@@ -171,16 +172,14 @@ export default {
       var mdObjId = this.$route.query.objid;
       console.log(mdTitle);
       console.log(mdContent);
-      if (mdTitle == "" || mdContent == "") {
-        this.$message.error("标题或内容不能为空！");
-        return;
-      }
+
       if (this.$route.query.opt == "create") {
         // 新增内容
-        if (
-          this.$route.params.panelType != "all" ||
-          this.$route.params.panelType != "profile"
-        ) {
+        if (this.$route.params.panelType != "all" && this.$route.params.panelType != "profile") {
+          if (mdTitle == "" || mdContent == "") {
+            this.$message.error("标题或内容不能为空！");
+            return;
+          }
           var mdCreateTime = new Date().getTime();
           var mdContentType = this.$route.params.panelType;
           var createContentData = {
@@ -191,17 +190,41 @@ export default {
           };
           this.createContent(createContentData);
         } else if (this.$route.params.panelType == "profile") {
+          if (mdContent == "") {
+            this.$message.error("个人资料不能为空！");
+            return;
+          }
           // 保存个人资料
+          var createProfileData = {
+            profile: mdContent
+          };
+          this.createProfile(createProfileData);
         }
       } else if (this.$route.query.opt == "edit") {
-        // 保存内容
-        //
-        var updateContentData = {
-          title: mdTitle,
-          content: mdContent,
-          objectId: mdObjId
-        };
-        this.updateContent(updateContentData);
+        if(this.$route.params.panelType == "profile"){
+          if (mdContent == "") {
+            this.$message.error("个人资料不能为空！");
+            return;
+          }
+          var updateProfileData = {
+            objectId: this.profileData._id,
+            profile:mdContent
+          };
+          this.updateProfile(updateProfileData);
+
+        } else {
+          if (mdTitle == "" || mdContent == "") {
+            this.$message.error("标题或内容不能为空！");
+            return;
+          }
+          // 保存内容
+          var updateContentData = {
+            title: mdTitle,
+            content: mdContent,
+            objectId: mdObjId
+          };
+          this.updateContent(updateContentData);
+        }
       }
     },
     clickDelete: function() {},
@@ -231,6 +254,11 @@ export default {
         ) {
           this.setBtnSeen(false, false, false, true, true, false);
           this.tableSeen = false;
+        } else if(this.$route.query.opt == "browse"){
+          if(this.$route.params.panelType == 'profile'){
+            this.setBtnSeen(false, false, true, false, false, false);
+          this.tableSeen = false;
+          }
         }
       } else {
         switch (this.$route.params.panelType) {
@@ -241,7 +269,6 @@ export default {
           case "articles":
           case "essays":
           case "notes":
-          case "profile":
             this.setBtnSeen(false, true, false, false, false, false);
             this.tableSeen = true;
             break;
@@ -257,8 +284,12 @@ export default {
         } else if (this.$route.query.opt == "edit") {
           this.mdEditable = true;
         } else if (this.$route.query.opt == "browse") {
-          var getTheContentData = { objectId: this.$route.query.objid };
-          this.getTheContent(getTheContentData);
+          if(this.$route.params.panelType != 'profile'){
+            var getTheContentData = { objectId: this.$route.query.objid };
+            this.getTheContent(getTheContentData);
+          } else if(this.$route.params.panelType == 'profile'){
+            this.getProfile();
+          }
         }
       } else {
         this.mdEditable = false;
@@ -269,7 +300,7 @@ export default {
       this.loading = true;
       this.$http
         .post(
-          "http://hinotos.com:2333/api/getContents",
+          "/api/getContents",
           { contentType: type },
           { emulateJSON: true }
         )
@@ -300,7 +331,7 @@ export default {
       this.mdEditable = false;
       this.loading = true;
       this.$http
-        .post("http://hinotos.com:2333/api/getTheContent", data, {
+        .post("/api/getTheContent", data, {
           emulateJSON: true
         })
         .then(
@@ -326,7 +357,7 @@ export default {
       var _this = this;
       this.loading = true;
       this.$http
-        .post("http://hinotos.com:2333/api/updateContent", data, { emulateJSON: true })
+        .post("/api/updateContent", data, { emulateJSON: true })
         .then(
           res => {
             console.log(res.body);
@@ -349,7 +380,7 @@ export default {
       var _this = this;
       this.loading = true;
       this.$http
-        .post("http://hinotos.com:2333/api/createContent", data, { emulateJSON: true })
+        .post("/api/createContent", data, { emulateJSON: true })
         .then(
           res => {
             console.log(res.body);
@@ -367,6 +398,60 @@ export default {
             _this.$message.error("请求错误：" + err.status);
           }
         );
+    },
+    createProfile: function(data){
+      var _this = this;
+      this.loading = true;
+      this.$http.post("/api/addProfile", data, { emulateJSON: true })
+      .then(res => {
+        console.log(res.body);
+        var sucData = res.body;
+        _this.loading = false;
+        _this.$message({
+          message: sucData.errMsg,
+          type: sucData.msgType
+        });
+      }, err => {
+        console.log(err.status);
+        _this.loading = false;
+        _this.$message.error("请求错误：" + err.status);
+      });
+    },
+    getProfile: function() {
+      var _this = this;
+      this.mdEditable = false;
+      this.loading = true;
+      this.$http.get("/api/getProfile").then(
+        res => {
+          // console.log(res.body);
+          var sucData = res.body;
+          _this.profileData = sucData;
+          _this.contentObj = {title: '', content: _this.profileData.profile};
+          _this.loading = false;
+        }
+      );
+    },
+    updateProfile: function(data){
+      var _this = this;
+      this.loading = true;
+      this.$http.post("/api/updateProfile", data, { emulateJSON: true })
+      .then(res => {
+        console.log(res.body);
+        var sucData = res.body;
+        _this.loading = false;
+        _this.$message({
+          message: sucData.errMsg,
+          type: sucData.msgType
+        });
+        _this.$router.push({
+        path: "/controller/" + this.$route.params.panelType,
+        query: { opt: "browse" }
+      });
+      }, err => {
+        console.log(err.status);
+        _this.loading = false;
+        _this.$message.error("请求错误：" + err.status);
+      });
     }
   },
   watch: {
