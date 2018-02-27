@@ -108,7 +108,7 @@ export default {
         type: 'warning'
       }).then(()=>{
         _this.loading = true
-        _this.$http.post('/api/deleteContent', {objectId: row.objectId}, {emulateJSON:true})
+        _this.$http.post('http://hinotos.com:2333/api/deleteContent', {objectId: row.objectId}, {emulateJSON:true})
         .then(res => {
           console.log(res.body)
           var sucData = res.body
