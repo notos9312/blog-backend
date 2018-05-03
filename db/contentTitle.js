@@ -7,7 +7,8 @@ var contentTitleSchema = new Schema({
   createTime: Number,
   contentType: String,
   title: String,
-  objectId: String
+  objectId: String,
+  bSeen: Boolean
 })
 
 module.exports = mongoose.model('ContentTitle', contentTitleSchema, 'contentTitles');
