@@ -36,6 +36,15 @@
               @click="handleDelete(scope.$index, scope.row)">删除</el-button>
           </template>
         </el-table-column>
+        <el-table-column label="可视" width="120">
+          <template slot-scope="scope">
+            <el-switch
+              v-model="scope.row.bSeen"
+              active-color="#13ce66"
+              inactive-color="#ff4949"
+              @change="changeSeen(scope.row._id, scope.row.bSeen)"></el-switch>
+          </template>
+        </el-table-column>
         <!-- <el-table-column prop="title" label="标题" show-overflow-tooltip>
         </el-table-column> -->
       </el-table>
@@ -126,6 +135,25 @@ export default {
             _this.$message.error('请求错误：'+err.status)
         })
       }).catch(()=>{})
+    },
+    changeSeen: function(id, bSeen){
+      var _this = this
+      this.loading = true
+      var postData = {titleId: id, bSeen: bSeen}
+      this.$http.post('http://hinotos.com:2333/api/changeSeen', postData, {emulateJSON:true})
+      .then(res => {
+        console.log(res.body)
+        var sucData = res.body
+          _this.loading = false
+          _this.$message({
+            message: sucData.errMsg,
+            type: sucData.msgType
+          })
+      }, err => {
+        console.log(err.status)
+        _this.loading = false
+        _this.$message.error('请求错误：'+err.status)
+      })
     },
     selectOne: function(selection, row){
       console.log('selectOne')
