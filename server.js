@@ -63,6 +63,7 @@ app.post('/api/login', urlencodedParser, function(req, res){
 app.post('/api/createContent', urlencodedParser, function(req, res){
   // 先插入contents集合，再把标题插入到contentTitles集合
   var contentData = req.body
+  delete contentData.bSeen
   insertContent(contentData, function(contentError, contentResult){
     if (contentError) {
       console.log(contentError)
@@ -72,6 +73,7 @@ app.post('/api/createContent', urlencodedParser, function(req, res){
         createTime: contentResult.createTime,
         contentType: contentResult.contentType,
         title: contentResult.title,
+        bSeen: true,
         objectId: contentResult._id
       }
       insertContentTitle(titleData, function(titleError, titleResult){
@@ -209,6 +211,20 @@ app.post('/api/updateProfile', urlencodedParser, function(req, res){
   var updateProfile = req.body.profile
   var updateProfileStr = {profile: updateProfile}
   Profile.findByIdAndUpdate(profileObjId, updateProfileStr, function(error, result){
+    if(error) {
+      console.log(error)
+      res.send(JSON.stringify({ errCode: 999, errMsg: '数据库查询出错', msgType: 'error' }))
+    } else {
+      res.send(JSON.stringify({ errCode: 0, errMsg: '操作成功', msgType: 'success' }))
+    }
+  })
+})
+
+app.post('/api/changeSeen', urlencodedParser, function(req, res){
+  var titleId = req.body.titleId
+  var bSeen = req.body.bSeen
+  var changeStr = {bSeen: bSeen}
+  ContentTitle.findByIdAndUpdate(titleId, changeStr, function(error, result){
     if(error) {
       console.log(error)
       res.send(JSON.stringify({ errCode: 999, errMsg: '数据库查询出错', msgType: 'error' }))
