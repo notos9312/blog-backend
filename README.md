@@ -5,10 +5,10 @@
 ## 更新日志
 2018-05-03：
 <br>
-【A】1、contentTitleSchema中增加bSeen属性，新建文章时，bSeen默认为true
-【A】2、TablePanel.vue中增加“是否可视”一列，以滑块switch来表示和控制
-【A】3、新增changebSeen接口
-【D】4、删除远程仓库上的db/db.js文件
+> 【A】1、contentTitleSchema中增加bSeen属性，新建文章时，bSeen默认为true<br>
+【A】2、TablePanel.vue中增加“是否可视”一列，以滑块switch来表示和控制<br>
+【A】3、新增changebSeen接口<br>
+【D】4、删除远程仓库上的db/db.js文件<br>
 
 
 
