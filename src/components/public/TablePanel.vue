@@ -117,7 +117,7 @@ export default {
         type: 'warning'
       }).then(()=>{
         _this.loading = true
-        _this.$http.post('http://hinotos.com:2333/api/deleteContent', {objectId: row.objectId}, {emulateJSON:true})
+        _this.$http.post('/api/deleteContent', {objectId: row.objectId}, {emulateJSON:true})
         .then(res => {
           console.log(res.body)
           var sucData = res.body
@@ -140,7 +140,7 @@ export default {
       var _this = this
       this.loading = true
       var postData = {titleId: id, bSeen: bSeen}
-      this.$http.post('http://hinotos.com:2333/api/changeSeen', postData, {emulateJSON:true})
+      this.$http.post('/api/changeSeen', postData, {emulateJSON:true})
       .then(res => {
         console.log(res.body)
         var sucData = res.body
