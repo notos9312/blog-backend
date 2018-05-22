@@ -71,7 +71,7 @@ export default {
     },
     postData(data) {
       var _this = this
-      this.$http.post('http://hinotos.com:2333/api/login', {username:data.username, password:md5(data.password)}, {emulateJSON:true})
+      this.$http.post('/api/login', {username:data.username, password:md5(data.password)}, {emulateJSON:true})
       .then(res => {
         console.log(res.body)
         var sucData = res.body
@@ -90,7 +90,7 @@ export default {
     },
     getHello() {
       var _this = this
-      this.$http.get('http://hinotos.com:2333/api/hello').then(res => {
+      this.$http.get('/api/hello').then(res => {
         console.log(res.body)
         _this.$message(res.body)
       }, err => {
@@ -100,7 +100,7 @@ export default {
     },
     postCheck() {
       var _this = this
-      this.$http.post('http://hinotos.com:2333/api/check').then(res => {
+      this.$http.post('/api/check').then(res => {
         console.log(res.body);
         _this.$message('请求成功')
       }, err => {

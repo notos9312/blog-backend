@@ -300,7 +300,7 @@ export default {
       this.loading = true;
       this.$http
         .post(
-          "http://hinotos.com:2333/api/getContents",
+          "/api/getContents",
           { contentType: type },
           { emulateJSON: true }
         )
@@ -331,7 +331,7 @@ export default {
       this.mdEditable = false;
       this.loading = true;
       this.$http
-        .post("http://hinotos.com:2333/api/getTheContent", data, {
+        .post("/api/getTheContent", data, {
           emulateJSON: true
         })
         .then(
@@ -357,7 +357,7 @@ export default {
       var _this = this;
       this.loading = true;
       this.$http
-        .post("http://hinotos.com:2333/api/updateContent", data, { emulateJSON: true })
+        .post("/api/updateContent", data, { emulateJSON: true })
         .then(
           res => {
             console.log(res.body);
@@ -380,7 +380,7 @@ export default {
       var _this = this;
       this.loading = true;
       this.$http
-        .post("http://hinotos.com:2333/api/createContent", data, { emulateJSON: true })
+        .post("/api/createContent", data, { emulateJSON: true })
         .then(
           res => {
             console.log(res.body);
@@ -402,7 +402,7 @@ export default {
     createProfile: function(data){
       var _this = this;
       this.loading = true;
-      this.$http.post("http://hinotos.com:2333/api/addProfile", data, { emulateJSON: true })
+      this.$http.post("/api/addProfile", data, { emulateJSON: true })
       .then(res => {
         console.log(res.body);
         var sucData = res.body;
@@ -421,7 +421,7 @@ export default {
       var _this = this;
       this.mdEditable = false;
       this.loading = true;
-      this.$http.get("http://hinotos.com:2333/api/getProfile").then(
+      this.$http.get("/api/getProfile").then(
         res => {
           // console.log(res.body);
           var sucData = res.body;
@@ -434,7 +434,7 @@ export default {
     updateProfile: function(data){
       var _this = this;
       this.loading = true;
-      this.$http.post("http://hinotos.com:2333/api/updateProfile", data, { emulateJSON: true })
+      this.$http.post("/api/updateProfile", data, { emulateJSON: true })
       .then(res => {
         console.log(res.body);
         var sucData = res.body;
