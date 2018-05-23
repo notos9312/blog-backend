@@ -1,6 +1,8 @@
 # blog-backend
 
 这是个人博客的后台项目，并不会在互联网上公开该项目的线上访问地址，但欢迎访问本人的博客网站: [南风有信](http://hinotos.com)
+<br>
+个人博客的源码请移步至: [GitHub of hinotos.com](https://github.com/notos9312/hinotos.com)
 <br><br>
 ## 更新日志
 ### 2018-05-03：
