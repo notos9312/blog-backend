@@ -11,6 +11,7 @@ var Profile = require('./db/profile.js')
 var app = express()
 app.use(express.static(__dirname + '/src'))
 var urlencodedParser = bodyParser.urlencoded({ extended: false })
+var bodyParserJson = bodyParser.json()
 
 /* app.all('*', function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*")
@@ -30,7 +31,7 @@ app.post('/api/check', function(req, res){
   res.send(req)
 })
 
-app.post('/api/addUser', urlencodedParser, function(req, res){
+app.post('/api/addUser', bodyParserJson, function(req, res){
   var userData = req.body
   insertUser(userData, function(error, result){
     if (error) {
@@ -41,7 +42,7 @@ app.post('/api/addUser', urlencodedParser, function(req, res){
   })
 })
 
-app.post('/api/login', urlencodedParser, function(req, res){
+app.post('/api/login', bodyParserJson, function(req, res){
   var verify_username = req.body.username
   var verify_password = req.body.password
   // 查询语句
@@ -60,7 +61,7 @@ app.post('/api/login', urlencodedParser, function(req, res){
   })
 })
 
-app.post('/api/createContent', urlencodedParser, function(req, res){
+app.post('/api/createContent', bodyParserJson, function(req, res){
   // 先插入contents集合，再把标题插入到contentTitles集合
   var contentData = req.body
   delete contentData.bSeen
@@ -88,7 +89,7 @@ app.post('/api/createContent', urlencodedParser, function(req, res){
   })
 })
 
-app.post('/api/getContents', urlencodedParser, function(req, res){
+app.post('/api/getContents', bodyParserJson, function(req, res){
   var whereStr = {}
   var opt = {
     __v:0,
@@ -121,7 +122,7 @@ app.post('/api/getContents', urlencodedParser, function(req, res){
   })
 })
 
-app.post('/api/getTheContent', urlencodedParser, function(req, res){
+app.post('/api/getTheContent', bodyParserJson, function(req, res){
   var id = req.body.objectId
   Content.findById(id, function(error, result){
     if(error){
@@ -137,7 +138,7 @@ app.post('/api/getTheContent', urlencodedParser, function(req, res){
   })
 })
 
-app.post('/api/updateContent', urlencodedParser, function(req, res){
+app.post('/api/updateContent', bodyParserJson, function(req, res){
   var updateObjId = req.body.objectId
   var updateContent = req.body.content
   var updateTitle = req.body.title
@@ -163,7 +164,7 @@ app.post('/api/updateContent', urlencodedParser, function(req, res){
   })
 })
 
-app.post('/api/deleteContent', urlencodedParser, function(req, res){
+app.post('/api/deleteContent', bodyParserJson, function(req, res){
   var deleteObjId = req.body.objectId
   var whereStr = {objectId: deleteObjId}
   Content.findByIdAndRemove(deleteObjId, function(contentError, contentResult){
@@ -183,7 +184,7 @@ app.post('/api/deleteContent', urlencodedParser, function(req, res){
   })
 })
 
-// app.post('/api/addProfile', urlencodedParser, function(req, res){
+// app.post('/api/addProfile', bodyParserJson, function(req, res){
 //   var profileData = req.body
 //   insertProfile(profileData, function (error, result) {
 //     if (error) {
@@ -206,7 +207,7 @@ app.get('/api/getProfile', function(req, res){
   })
 })
 
-app.post('/api/updateProfile', urlencodedParser, function(req, res){
+app.post('/api/updateProfile', bodyParserJson, function(req, res){
   var profileObjId = req.body.objectId
   var updateProfile = req.body.profile
   var updateProfileStr = {profile: updateProfile}
@@ -220,7 +221,7 @@ app.post('/api/updateProfile', urlencodedParser, function(req, res){
   })
 })
 
-app.post('/api/changeSeen', urlencodedParser, function(req, res){
+app.post('/api/changeSeen', bodyParserJson, function(req, res){
   var titleId = req.body.titleId
   var bSeen = req.body.bSeen
   var changeStr = {bSeen: bSeen}
