@@ -3,18 +3,21 @@
 import Vue from 'vue'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-chalk/index.css'
-import VueResource from 'vue-resource'
+//import VueResource from 'vue-resource'
 import App from './App'
 import router from './router'
 // import Vuex from 'vuex'
 import mavonEditor from 'mavon-editor'
 // 可以通过 mavonEditor.markdownIt 获取解析器markdown-it对象
 import 'mavon-editor/dist/css/index.css'
+//axios
+import axios from 'axios'
 
 Vue.use(ElementUI)
-Vue.use(VueResource)
+//Vue.use(VueResource)
 // Vue.use(Vuex)
 Vue.use(mavonEditor)
+Vue.prototype.$axios = axios
 
 Vue.config.productionTip = false
 
