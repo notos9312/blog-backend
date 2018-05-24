@@ -117,10 +117,9 @@ export default {
         type: 'warning'
       }).then(()=>{
         _this.loading = true
-        _this.$http.post('/api/deleteContent', {objectId: row.objectId}, {emulateJSON:true})
+        _this.$axios.post('/api/deleteContent', {objectId: row.objectId})
         .then(res => {
-          console.log(res.body)
-          var sucData = res.body
+          var sucData = res.data
           _this.loading = false
           _this.$message({
             message: sucData.errMsg,
@@ -129,10 +128,9 @@ export default {
           if(sucData.errCode == 0){
             _this.mTitles.splice(index,1)
           }
-        }, err => {
-          console.log(err.status)
+        }).catch(err => {
             _this.loading = false
-            _this.$message.error('请求错误：'+err.status)
+            _this.$message.error('请求错误')
         })
       }).catch(()=>{})
     },
@@ -140,19 +138,17 @@ export default {
       var _this = this
       this.loading = true
       var postData = {titleId: id, bSeen: bSeen}
-      this.$http.post('/api/changeSeen', postData, {emulateJSON:true})
+      this.$axios.post('/api/changeSeen', postData)
       .then(res => {
-        console.log(res.body)
-        var sucData = res.body
+        var sucData = res.data
           _this.loading = false
           _this.$message({
             message: sucData.errMsg,
             type: sucData.msgType
           })
-      }, err => {
-        console.log(err.status)
+      }).catch(err => {
         _this.loading = false
-        _this.$message.error('请求错误：'+err.status)
+        _this.$message.error('请求错误')
       })
     },
     selectOne: function(selection, row){

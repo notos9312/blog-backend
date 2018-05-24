@@ -170,8 +170,6 @@ export default {
       var mdTitle = this.$refs.markdown.titleData;
       var mdContent = this.$refs.markdown.mdData;
       var mdObjId = this.$route.query.objid;
-      console.log(mdTitle);
-      console.log(mdContent);
 
       if (this.$route.query.opt == "create") {
         // 新增内容
@@ -298,31 +296,21 @@ export default {
     getContents: function(type) {
       var _this = this;
       this.loading = true;
-      this.$http
-        .post(
-          "/api/getContents",
-          { contentType: type },
-          { emulateJSON: true }
-        )
-        .then(
-          res => {
-            //res
+      this.$axios.post("/api/getContents", { contentType: type })
+        .then(res => {
             _this.loading = false;
-            if (res.body.hasOwnProperty("errCode")) {
+            if (res.data.hasOwnProperty("errCode")) {
               _this.$message({
-                message: res.body.errMsg,
-                type: res.body.msgType
+                message: res.data.errMsg,
+                type: res.data.msgType
               });
             } else {
-              this.titleData = res.body;
+              this.titleData = res.data;
             }
-          },
-          err => {
-            console.log(err.status);
+          }).catch(err => {
             _this.loading = false;
-            _this.$message.error("请求错误：" + err.status);
-          }
-        );
+            _this.$message.error('请求错误');
+          });
     },
     getTheContent: function(data) {
       var _this = this;
@@ -330,101 +318,82 @@ export default {
       this.tableSeen = false;
       this.mdEditable = false;
       this.loading = true;
-      this.$http
-        .post("/api/getTheContent", data, {
-          emulateJSON: true
-        })
+      this.$axios.post("/api/getTheContent", data)
         .then(
           res => {
             _this.loading = false;
-            if (res.body.hasOwnProperty("errCode") && res.body.errCode != 0) {
+            if (res.data.hasOwnProperty("errCode") && res.data.errCode != 0) {
               _this.$message({
-                message: res.body.errMsg,
-                type: res.body.msgType
+                message: res.data.errMsg,
+                type: res.data.msgType
               });
             } else {
-              this.contentObj = res.body;
+              this.contentObj = res.data;
             }
-          },
-          err => {
-            console.log(err.status);
+          }).catch(err => {
             _this.loading = false;
-            _this.$message.error("请求错误：" + err.status);
-          }
-        );
+            _this.$message.error('请求错误');
+          });
     },
     updateContent: function(data) {
       var _this = this;
       this.loading = true;
-      this.$http
-        .post("/api/updateContent", data, { emulateJSON: true })
+      this.$axios.post("/api/updateContent", data)
         .then(
           res => {
-            console.log(res.body);
-            var sucData = res.body;
+            var sucData = res.data;
             _this.loading = false;
             _this.$message({
               message: sucData.errMsg,
               type: sucData.msgType
             });
             _this.$router.push("/controller/" + _this.$route.params.panelType);
-          },
-          err => {
-            console.log(err.status);
+          }).catch(err => {
             _this.loading = false;
-            _this.$message.error("请求错误：" + err.status);
-          }
-        );
+            _this.$message.error('请求错误');
+          });
     },
     createContent: function(data) {
       var _this = this;
       this.loading = true;
-      this.$http
-        .post("/api/createContent", data, { emulateJSON: true })
+      this.$axios.post("/api/createContent", data)
         .then(
           res => {
-            console.log(res.body);
-            var sucData = res.body;
+            var sucData = res.data;
             _this.loading = false;
             _this.$message({
               message: sucData.errMsg,
               type: sucData.msgType
             });
             _this.$router.push("/controller/" + _this.$route.params.panelType);
-          },
-          err => {
-            console.log(err.status);
+          }).catch(err => {
             _this.loading = false;
-            _this.$message.error("请求错误：" + err.status);
-          }
-        );
+            _this.$message.error('请求错误');
+          });
     },
     createProfile: function(data){
       var _this = this;
       this.loading = true;
-      this.$http.post("/api/addProfile", data, { emulateJSON: true })
+      this.$axios.post("/api/addProfile", data)
       .then(res => {
-        console.log(res.body);
-        var sucData = res.body;
+        var sucData = res.data;
         _this.loading = false;
         _this.$message({
           message: sucData.errMsg,
           type: sucData.msgType
         });
-      }, err => {
-        console.log(err.status);
+      }).catch(err => {
         _this.loading = false;
-        _this.$message.error("请求错误：" + err.status);
+        _this.$message.error('请求错误');
       });
     },
     getProfile: function() {
       var _this = this;
       this.mdEditable = false;
       this.loading = true;
-      this.$http.get("/api/getProfile").then(
+      this.$axios.get("/api/getProfile").then(
         res => {
-          // console.log(res.body);
-          var sucData = res.body;
+          var sucData = res.data;
           _this.profileData = sucData;
           _this.contentObj = {title: '', content: _this.profileData.profile};
           _this.loading = false;
@@ -434,10 +403,9 @@ export default {
     updateProfile: function(data){
       var _this = this;
       this.loading = true;
-      this.$http.post("/api/updateProfile", data, { emulateJSON: true })
+      this.$axios.post("/api/updateProfile", data)
       .then(res => {
-        console.log(res.body);
-        var sucData = res.body;
+        var sucData = res.data;
         _this.loading = false;
         _this.$message({
           message: sucData.errMsg,
@@ -447,10 +415,9 @@ export default {
         path: "/controller/" + this.$route.params.panelType,
         query: { opt: "browse" }
       });
-      }, err => {
-        console.log(err.status);
+      }).catch(err => {
         _this.loading = false;
-        _this.$message.error("请求错误：" + err.status);
+        _this.$message.error('请求错误');
       });
     }
   },

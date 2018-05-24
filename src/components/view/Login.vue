@@ -18,127 +18,128 @@
 </template>
 
 <script>
-import md5 from 'js-md5'
-import NotFooter from '@/components/public/NotFooter.vue'
+import md5 from "js-md5";
+import NotFooter from "@/components/public/NotFooter.vue";
 
 export default {
   data() {
     var validateUsername = (rule, value, callback) => {
-      if (value === '') {
-        callback(new Error('请输入用户名!'))
+      if (value === "") {
+        callback(new Error("请输入用户名!"));
       } else {
-        callback()
+        callback();
       }
-    }
+    };
 
     var validatePassword = (rule, value, callback) => {
-      if (value === '') {
-        callback(new Error('请输入密码!'))
+      if (value === "") {
+        callback(new Error("请输入密码!"));
       } else {
-        callback()
+        callback();
       }
-    }
+    };
 
     return {
       loginForm: {
-        username: '',
-        password: ''
+        username: "",
+        password: ""
       },
       loginRules: {
-        username: [
-          {validator: validateUsername, trigger: 'blur'}
-        ],
-        password: [
-          {validator: validatePassword, trigger: 'blur'}
-        ]
+        username: [{ validator: validateUsername, trigger: "blur" }],
+        password: [{ validator: validatePassword, trigger: "blur" }]
       }
-    }
+    };
   },
   methods: {
     login() {
-      this.$refs.loginForm.validate((valid)=>{
+      this.$refs.loginForm.validate(valid => {
         if (valid) {
-          this.postData(this.loginForm)
+          this.postData(this.loginForm);
           // console.log(md5(this.loginForm.password))
         } else {
           this.$message({
-            message: '请按要求输入',
-            type: 'warning'
-          })
+            message: "请按要求输入",
+            type: "warning"
+          });
           // this.$router.push({path:'/test/123'})
         }
-      })
+      });
     },
     postData(data) {
-      var _this = this
-      this.$http.post('/api/login', {username:data.username, password:md5(data.password)}, {emulateJSON:true})
-      .then(res => {
-        console.log(res.body)
-        var sucData = res.body
-        if(sucData.errCode != 0)
-          _this.$message({
-            message: sucData.errMsg,
-            type: sucData.msgType
-          })
-          if(sucData.errCode === 0){
-            _this.$router.push({path:'/controller/all'})
+      var _this = this;
+      this.$axios.post('/api/login', {username:data.username, password:md5(data.password)})
+        .then(res => {
+          var sucData = res.data;
+          if (sucData.errCode != 0)
+            _this.$message({
+              message: sucData.errMsg,
+              type: sucData.msgType
+            });
+          if (sucData.errCode === 0) {
+            _this.$router.push({ path: "/controller/all" });
           }
-      }, err => {
-        console.log(err.status)
-        _this.$message.error('请求错误：'+err.status)
-      })
+        })
+        .catch(err => {
+          _this.$message.error("请求错误");
+        });
     },
     getHello() {
-      var _this = this
-      this.$http.get('/api/hello').then(res => {
-        console.log(res.body)
-        _this.$message(res.body)
-      }, err => {
-        console.log(err.status)
-        _this.$message.error('请求错误：'+err.status)
-      })
+      var _this = this;
+      this.$http.get("/api/hello").then(
+        res => {
+          console.log(res.body);
+          _this.$message(res.body);
+        },
+        err => {
+          console.log(err.status);
+          _this.$message.error("请求错误：" + err.status);
+        }
+      );
     },
     postCheck() {
-      var _this = this
-      this.$http.post('/api/check').then(res => {
-        console.log(res.body);
-        _this.$message('请求成功')
-      }, err => {
-        console.log(err.status)
-        _this.$message.error('请求错误：'+err.status)
-      })
+      var _this = this;
+      this.$http.post("/api/check").then(
+        res => {
+          console.log(res.body);
+          _this.$message("请求成功");
+        },
+        err => {
+          console.log(err.status);
+          _this.$message.error("请求错误：" + err.status);
+        }
+      );
     }
   },
   components: {
     NotFooter
   }
-}
+};
 </script>
 
 <style scoped>
-  #loginVue {
-    margin: 0 auto;
-    text-align: center;
-    height: 100%;
-  }
+#loginVue {
+  margin: 0 auto;
+  text-align: center;
+  height: 100%;
+}
 
-  #loginDiv {
-    width: 370px;
-    position: relative;
-    padding: 5px 0;
-    background: #fff;
-    margin: 0 auto;
-    top: 20%;
-    border: 0;
-    border-radius: 4px;
-  }
+#loginDiv {
+  width: 370px;
+  position: relative;
+  padding: 5px 0;
+  background: #fff;
+  margin: 0 auto;
+  top: 20%;
+  border: 0;
+  border-radius: 4px;
+}
 
-  .el-form-item {
-    width: 300px;
-    margin-left: 35px;
-  }
+.el-form-item {
+  width: 300px;
+  margin-left: 35px;
+}
 
-  .el-form {
-    padding-top: 30px;
-  }
+.el-form {
+  padding-top: 30px;
+}
 </style>
