@@ -17,3 +17,8 @@
 ### 2018-05-23：
 > 【M】1、将nodejs服务器的CROS跨域设置代码注释，不支持跨域
 
+### 2018-05-24：
+> 【M】1、引入axios，并用axios替换vue-resource<br>
+【M】2、使nodejs服务器的api接受content-type为application/json类型的数据<br>
+【D】npm uninstall vue-resource和vuex
+
