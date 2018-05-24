@@ -20,5 +20,5 @@
 ### 2018-05-24：
 > 【M】1、引入axios，并用axios替换vue-resource<br>
 【M】2、使nodejs服务器的api接受content-type为application/json类型的数据<br>
-【D】npm uninstall vue-resource和vuex
+【D】3、npm uninstall vue-resource和vuex
 
