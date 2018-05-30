@@ -305,7 +305,7 @@ export default {
                 type: res.data.msgType
               });
             } else {
-              this.titleData = res.data;
+              this.titleData = res.data.sort((i,j)=>{return j.createTime - i.createTime});
             }
           }).catch(err => {
             _this.loading = false;

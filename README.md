@@ -22,3 +22,6 @@
 【M】2、使nodejs服务器的api接受content-type为application/json类型的数据<br>
 【D】3、npm uninstall vue-resource和vuex
 
+### 2018-05-30：
+> * 【M】标题列表按文章创建时间倒序输出，越新的文章越靠前
+
